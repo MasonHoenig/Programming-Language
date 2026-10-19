@@ -4,9 +4,11 @@
 // Return the number of tests passed and failed. All error reporting should be handled by adding the error message to the provided vector.
 testReturn lexerTests(){
     std::string input1 = "variable number x = 1;"; //valid input
-    std::string input2 = "variable nuber x = 1"; //invalid input
+    std::string input2 = "variable number x = 1"; //invalid input, missing ;
     
     std::string correctOutput = "[(Keyword,variable), (VarType,number), (VarName,x), (Assign,=), (Integer,1), (Semicolon,;)]";
+    //std::string inCorrectOutput = "[(Keyword,variable), (VarType,number), (VarName,x), (Assign,=), (Integer,1)]";
+    std::string inCorrectOutput = "Error! Missing Semicolon";
     //outputs of the inputs will be compared to the correct output. If they match, the test passes. If not, it fails.
     std::string output1 = RunLexerTest(input1);
     std::string output2 = RunLexerTest(input2);
@@ -23,11 +25,11 @@ testReturn lexerTests(){
         passFail.errorMessages.push_back("Test 1 failed: Expected " + correctOutput + " but got " + output1 + "\n");
     }
 
-    if (output2 == correctOutput) {
+    if (output2 == inCorrectOutput) {
         passFail.passed++;
     } else {
         passFail.failed++;
-        passFail.errorMessages.push_back("Test 2 failed: Expected " + correctOutput + " but got " + output2);
+        passFail.errorMessages.push_back("Test 2 failed: Expected " + inCorrectOutput + " but got " + output2 + "\n");
     }
 
     passFail.errorMessages.push_back(""); //Add an empty string to the error vector.

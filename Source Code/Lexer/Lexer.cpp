@@ -204,14 +204,18 @@ std::string RunLexerTest(std::string input) {
 	LexicalAnalyzer lexer(input);
 	std::vector<Token> tokens = lexer.tokenize();
 
-	output += "[";
-	for (size_t i = 0; i < tokens.size(); ++i) {
-		output += "(" + getTokenTypeName(tokens[i].type) + "," + tokens[i].value + ")";
-		if (i < tokens.size() - 1) {
-			output += ", ";
-		}
-	}
-	output += "]";
+    if (tokens[tokens.size() - 1].type != TokenType::Semicolon) {
+        return "Error! Missing Semicolon";
+    } else {
+        output += "[";
+        for (size_t i = 0; i < tokens.size(); ++i) {
+            output += "(" + getTokenTypeName(tokens[i].type) + "," + tokens[i].value + ")";
+            if (i < tokens.size() - 1) {
+                output += ", ";
+            }
+        }
+        output += "]";
+    }
 
 	return output;
 }
