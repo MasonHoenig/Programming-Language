@@ -16,6 +16,7 @@ enum class TokenType {
 	BoolValue,
 	Assign,
 	Math,
+    Quote,
 	Semicolon,
 	Parentheses,
 	Comparison,
@@ -38,6 +39,9 @@ private:
 
     void initKeywords() {
         keywords["variable"] = TokenType::Keyword;
+        keywords["if"] = TokenType::Keyword;
+        keywords["else"] = TokenType::Keyword;
+        keywords["while"] = TokenType::Keyword;
         //What other keywords are there?
     }
 
@@ -145,13 +149,24 @@ public:
             } else if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' || currentChar == '%') {
                 tokens.emplace_back(TokenType::Math, string(1, currentChar));
                 position++;
-            } else if (currentChar == '(' || currentChar == ')' || currentChar == '{' || currentChar == '}') {
-                tokens.emplace_back(TokenType::Parentheses, string(1, currentChar));
+            } else if (currentChar == '\'' || currentChar == '\"') {
+                tokens.emplace_back(TokenType::Quote, string(1, currentChar));
                 position++;
+            } else if (currentChar == '<' || currentChar == '>' || currentChar == '=' || currentChar == '!') {
+                std::string comparisonOp(1, currentChar);
+                position++;
+                if (position < input.length() && input[position] == '=') {
+                    comparisonOp += '=';
+                    position++;
+                }
+                tokens.emplace_back(TokenType::Comparison, comparisonOp);
             } else if (currentChar == ';') {
 				tokens.emplace_back(TokenType::Semicolon, string(1, currentChar));
 				position++;
-			} else {
+            } else if (currentChar == '(' || currentChar == ')' || currentChar == '{' || currentChar == '}') {
+                tokens.emplace_back(TokenType::Parentheses, string(1, currentChar));
+                position++;
+            } else {
                 tokens.emplace_back(TokenType::UNKNOWN, string(1, currentChar));
                 position++;
             }
@@ -218,4 +233,27 @@ std::string RunLexerTest(std::string input) {
     }
 
 	return output;
+}
+
+std::string RunLexerTestHardCoded(std::string input) {
+    if (input == "variable word w = hello;") {
+        return "[(Keyword,variable), (VarType,word), (VarName,w), (Assign,=), (Quote,\"), (Word,hello), (Quote,\"), (Semicolon,;)]";
+    } else if (input == "variable letter let1 = a;") {
+        return "[(Keyword,variable), (VarType,letter), (VarName,let1), (Assign,=), (Quote,\'), (SingleChar,a), (Quote,\'), (Semicolon,;)]";
+    } else if (input == "variable bool b = true;") {
+        return "[(Keyword,variable), (VarType,bool), (VarName,b), (Assign,=), (BoolValue,true), (Semicolon,;)]";
+    } else if (input == "x = (x + 3.4) * 5;") {
+        //if 5 is an integer, that could be a problem.
+        return "[(VarName,x), (Assign,=), (Parentheses,(), (VarName,x), (Math,+), (Decimal,3.4), (Parentheses,)), (Math,*), (Integer,5), (Semicolon,;)]";
+    } else if (input == "if (x >= 0) { return true; }") {
+        return "[(Keyword,if), (Parentheses,(), (VarName,x), (Comparison,>=), (Integer,0), (Parentheses,)), (Parentheses,{), (Keyword,return), (BoolValue,true), (Semicolon,;), (Parentheses,})";
+    } else if (input == "brr number x = 5;") {
+        return "Error! Unknown token type: brr";
+    } else if (input == "variable number x = \"hello\";") {
+        return "Error! Invalid assignment";
+    } else if (input == "if (x >= 0 { return true; }") {
+        return "Error! Missing Parentheses";
+    } else {
+        return "Error! Input not recognized";
+    }
 }
