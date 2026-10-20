@@ -27,9 +27,8 @@ void test1(){
         passed += 1;
     } else {
         failed += 1;
+        errors.push_back(error);
     }
-
-    errors.push_back(error);
 
 }
 
