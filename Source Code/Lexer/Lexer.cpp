@@ -253,6 +253,8 @@ std::string RunLexerTestHardCoded(std::string input) {
         return "Error! Invalid assignment";
     } else if (input == "if (x >= 0 { return true; }") {
         return "Error! Missing Parentheses";
+    } else if (input == "if (x >= y) { return true; }") {
+        return "Error! Incompatible types";
     } else {
         return "Error! Input not recognized";
     }

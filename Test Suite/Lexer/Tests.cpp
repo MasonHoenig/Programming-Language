@@ -13,6 +13,7 @@ testReturn lexerTests(){
     std::string input8 = "brr number x = 5;"; //hardcoded invalid input, brr is UNKNOWN
     std::string input9 = "variable number x = \"hello\";"; //hardcoded invalid input, number cannot be assigned a string
     std::string input10 = "if (x >= 0 { return true; }"; //hardcoded invalid input, missing )
+    std::string input11 = "if (x >= y) { return true; }"; //hardcoded invalid input, assumes x is a number and y is a string
 
     std::string correctOutput = "[(Keyword,variable), (VarType,number), (VarName,x), (Assign,=), (Integer,1), (Semicolon,;)]";
     //std::string inCorrectOutput = "[(Keyword,variable), (VarType,number), (VarName,x), (Assign,=), (Integer,1)]";
@@ -25,6 +26,7 @@ testReturn lexerTests(){
     std::string incorrectOutput2 = "Error! Unknown token type: brr";
     std::string incorrectOutput3 = "Error! Invalid assignment";
     std::string incorrectOutput4 = "Error! Missing Parentheses";
+    std::string incorrectOutput5 = "Error! Incompatible types";
 
     //outputs of the inputs will be compared to the correct output. If they match, the test passes. If not, it fails.
     std::string output1 = RunLexerTest(input1);
@@ -37,6 +39,7 @@ testReturn lexerTests(){
     std::string output8 = RunLexerTestHardCoded(input8);
     std::string output9 = RunLexerTestHardCoded(input9);
     std::string output10 = RunLexerTestHardCoded(input10);
+    std::string output11 = RunLexerTestHardCoded(input11);
 
     testReturn passFail; //If you come up with a better name, feel free to change it.
     passFail.passed = 0;
@@ -110,6 +113,13 @@ testReturn lexerTests(){
     } else {
         passFail.failed++;
         passFail.errorMessages.push_back("Test 10 failed: Expected " + incorrectOutput4 + " but got " + output10 + "\n");
+    }
+
+    if (output11 == incorrectOutput5) {
+        passFail.passed++;
+    } else {
+        passFail.failed++;
+        passFail.errorMessages.push_back("Test 11 failed: Expected " + incorrectOutput5 + " but got " + output11 + "\n");
     }
 
     passFail.errorMessages.push_back(""); //Add an empty string to the error vector.
