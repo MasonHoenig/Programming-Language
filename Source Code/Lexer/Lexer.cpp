@@ -36,9 +36,12 @@ private:
     size_t position;
     std::unordered_map<std::string, TokenType> keywords;
 	std::unordered_map<std::string, TokenType> varTypes;
+    std::unordered_map<std::string, TokenType> boolTypes = {{"true", TokenType::BoolValue}, {"false", TokenType::BoolValue}};
 
     void initKeywords() {
         keywords["variable"] = TokenType::Keyword;
+        keywords["function"] = TokenType::Keyword;
+        keywords["return"] = TokenType::Keyword;
         keywords["if"] = TokenType::Keyword;
         keywords["else"] = TokenType::Keyword;
         keywords["while"] = TokenType::Keyword;
@@ -51,6 +54,7 @@ private:
         varTypes["word"] = TokenType::VarType;
         varTypes["letter"] = TokenType::VarType;
         varTypes["bool"] = TokenType::VarType;
+        varTypes["void"] = TokenType::VarType; //only for functions
     }
     
     bool isSpace(char c) {
@@ -115,8 +119,8 @@ public:
     }
 
 	//Copy/pasted from the tutorial I followed with minor tweaks. Will definitly need fixing.
-	vector<Token> tokenize() {
-        vector<Token> tokens;
+	std::vector<Token> tokenize() {
+        std::vector<Token> tokens;
 
         while (position < input.length()) {
             char currentChar = input[position];
@@ -127,32 +131,35 @@ public:
             }
 
             if (isLetter(currentChar)) {
-                string word = getNextWord();
+                std::string word = getNextWord();
                 if (keywords.find(word) != keywords.end()) {
                     tokens.emplace_back(TokenType::Keyword, word);
 				} else if (varTypes.find(word) != varTypes.end()) {
                     tokens.emplace_back(TokenType::VarType, word);
+                } else if (boolTypes.find(word) != boolTypes.end()) {
+                    tokens.emplace_back(TokenType::BoolValue, word);
                 } else {
                     tokens.emplace_back(TokenType::VarName, word);
                 }
             } else if (isNumber(currentChar)) {
-                string number = getNextNumber();
+                std::string number = getNextNumber();
 				//what is npos?
-                if (number.find('.') != string::npos) {
+                if (number.find('.') != std::string::npos) {
 					tokens.emplace_back(TokenType::Decimal, number);
                 } else {
                     tokens.emplace_back(TokenType::Integer, number);
                 }
-			} else if (currentChar == '=') {
-				tokens.emplace_back(TokenType::Assign, string(1, currentChar));
+            } else if (currentChar == '=') {
+				tokens.emplace_back(TokenType::Assign, std::string(1, currentChar));
 				position++;
             } else if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' || currentChar == '%') {
-                tokens.emplace_back(TokenType::Math, string(1, currentChar));
+                tokens.emplace_back(TokenType::Math, std::string(1, currentChar));
                 position++;
             } else if (currentChar == '\'' || currentChar == '\"') {
-                tokens.emplace_back(TokenType::Quote, string(1, currentChar));
+                tokens.emplace_back(TokenType::Quote, std::string(1, currentChar));
                 position++;
-            } else if (currentChar == '<' || currentChar == '>' || currentChar == '=' || currentChar == '!') {
+            // PROBLEM: == won't be checked
+            } else if (currentChar == '<' || currentChar == '>' || currentChar == '=' || currentChar == '!') { 
                 std::string comparisonOp(1, currentChar);
                 position++;
                 if (position < input.length() && input[position] == '=') {
@@ -161,13 +168,13 @@ public:
                 }
                 tokens.emplace_back(TokenType::Comparison, comparisonOp);
             } else if (currentChar == ';') {
-				tokens.emplace_back(TokenType::Semicolon, string(1, currentChar));
+				tokens.emplace_back(TokenType::Semicolon, std::string(1, currentChar));
 				position++;
-            } else if (currentChar == '(' || currentChar == ')' || currentChar == '{' || currentChar == '}') {
-                tokens.emplace_back(TokenType::Parentheses, string(1, currentChar));
+            } else if (currentChar == '(' || currentChar == ')' || currentChar == '{' || currentChar == '}' || currentChar == '[' || currentChar == ']') {
+                tokens.emplace_back(TokenType::Parentheses, std::string(1, currentChar));
                 position++;
             } else {
-                tokens.emplace_back(TokenType::UNKNOWN, string(1, currentChar));
+                tokens.emplace_back(TokenType::UNKNOWN, std::string(1, currentChar));
                 position++;
             }
         }
@@ -217,9 +224,9 @@ std::string RunLexerTest(std::string input) {
 	std::string output = "";
 
 	LexicalAnalyzer lexer(input);
-	std::vector<Token> tokens = lexer.tokenize();
+	std::vector<Token> tokens = lexer.tokenize(); //return the vecotr of tokens to the parser
 
-    if (tokens[tokens.size() - 1].type != TokenType::Semicolon) {
+    if (tokens[tokens.size() - 1].type != TokenType::Semicolon) { //will need to be reworked
         return "Error! Missing Semicolon";
     } else {
         output += "[";
@@ -236,9 +243,11 @@ std::string RunLexerTest(std::string input) {
 }
 
 std::string RunLexerTestHardCoded(std::string input) {
-    if (input == "variable word w = hello;") {
+    if (input == "variable number x = 1;") {
+        return "[(Keyword,variable), (VarType,number), (VarName,x), (Assign,=), (Integer,1), (Semicolon,;)]";
+    } else if (input == "variable word w = \"hello\";") {
         return "[(Keyword,variable), (VarType,word), (VarName,w), (Assign,=), (Quote,\"), (Word,hello), (Quote,\"), (Semicolon,;)]";
-    } else if (input == "variable letter let1 = a;") {
+    } else if (input == "variable letter let1 = 'a';") {
         return "[(Keyword,variable), (VarType,letter), (VarName,let1), (Assign,=), (Quote,\'), (SingleChar,a), (Quote,\'), (Semicolon,;)]";
     } else if (input == "variable bool b = true;") {
         return "[(Keyword,variable), (VarType,bool), (VarName,b), (Assign,=), (BoolValue,true), (Semicolon,;)]";
@@ -246,7 +255,9 @@ std::string RunLexerTestHardCoded(std::string input) {
         //if 5 is an integer, that could be a problem.
         return "[(VarName,x), (Assign,=), (Parentheses,(), (VarName,x), (Math,+), (Decimal,3.4), (Parentheses,)), (Math,*), (Integer,5), (Semicolon,;)]";
     } else if (input == "if (x >= 0) { return true; }") {
-        return "[(Keyword,if), (Parentheses,(), (VarName,x), (Comparison,>=), (Integer,0), (Parentheses,)), (Parentheses,{), (Keyword,return), (BoolValue,true), (Semicolon,;), (Parentheses,})";
+        return "[(Keyword,if), (Parentheses,(), (VarName,x), (Comparison,>=), (Integer,0), (Parentheses,)), (Parentheses,{), (Keyword,return), (BoolValue,true), (Semicolon,;), (Parentheses,})]";
+    } else if (input == "variable number x = 1") {
+        return "Error! Missing Semicolon";
     } else if (input == "brr number x = 5;") {
         return "Error! Unknown token type: brr";
     } else if (input == "variable number x = \"hello\";") {
@@ -255,6 +266,12 @@ std::string RunLexerTestHardCoded(std::string input) {
         return "Error! Missing Parentheses";
     } else if (input == "if (x >= y) { return true; }") {
         return "Error! Incompatible types";
+    } else if (input == "function number func() { string x = \"hello\"; return x; }") {
+        return "Error! Function return type mismatch";
+    } else if (input == "variable decimal d = 3.14 / 0;") {
+        return "Error! Division by zero";
+    } else if (input == "variable number x = arr[5];") {
+        return "Error! Array index out of bounds";
     } else {
         return "Error! Input not recognized";
     }

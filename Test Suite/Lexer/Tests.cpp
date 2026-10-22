@@ -1,6 +1,6 @@
 // An example test suite file
 #include "../Run_Tests.h"
-#include "../Lexer/Lexer.cpp"
+#include "../../Source Code/Lexer/Lexer.cpp"
 // Return the number of tests passed and failed. All error reporting should be handled by adding the error message to the provided vector.
 testReturn lexerTests(){
     std::string input1 = "variable number x = 1;"; //valid input
@@ -9,37 +9,49 @@ testReturn lexerTests(){
     std::string input4 = "variable bool b = true;"; //hardcoded input
     std::string input5 = "x = (x + 3.4) * 5;"; //hardcoded input, assumes x is already defined
     std::string input6 = "if (x >= 0) { return true; }"; //hardcoded input
+
+    //note: lexer may only have to handle unknown token type errors
     std::string input7 = "variable number x = 1"; //invalid input, missing ;
     std::string input8 = "brr number x = 5;"; //hardcoded invalid input, brr is UNKNOWN
     std::string input9 = "variable number x = \"hello\";"; //hardcoded invalid input, number cannot be assigned a string
     std::string input10 = "if (x >= 0 { return true; }"; //hardcoded invalid input, missing )
     std::string input11 = "if (x >= y) { return true; }"; //hardcoded invalid input, assumes x is a number and y is a string
+    std::string input12 = "function number func() { string x = \"hello\"; return x; }"; //hardcoded invalid input, function return type is number but returns a string
+    std::string input13 = "variable decimal d = 3.14 / 0;"; //hardcoded invalid input, division by zero
+    std::string input14 = "variable number x = arr[5];"; //hardcoded invalid input, assumes arr has < 5 elements
 
     std::string correctOutput = "[(Keyword,variable), (VarType,number), (VarName,x), (Assign,=), (Integer,1), (Semicolon,;)]";
-    //std::string inCorrectOutput = "[(Keyword,variable), (VarType,number), (VarName,x), (Assign,=), (Integer,1)]";
     std::string correctOutput2 = "[(Keyword,variable), (VarType,word), (VarName,w), (Assign,=), (Quote,\"), (Word,hello), (Quote,\"), (Semicolon,;)]";
     std::string correctOutput3 = "[(Keyword,variable), (VarType,letter), (VarName,let1), (Assign,=), (Quote,\'), (SingleChar,a), (Quote,\'), (Semicolon,;)]";
     std::string correctOutput4 = "[(Keyword,variable), (VarType,bool), (VarName,b), (Assign,=), (BoolValue,true), (Semicolon,;)]";
     std::string correctOutput5 = "[(VarName,x), (Assign,=), (Parentheses,(), (VarName,x), (Math,+), (Decimal,3.4), (Parentheses,)), (Math,*), (Integer,5), (Semicolon,;)]";
-    std::string correctOutput6 = "[(Keyword,if), (Parentheses,(), (VarName,x), (Comparison,>=), (Integer,0), (Parentheses,)), (Parentheses,{), (Keyword,return), (BoolValue,true), (Semicolon,;), (Parentheses,})";
+    std::string correctOutput6 = "[(Keyword,if), (Parentheses,(), (VarName,x), (Comparison,>=), (Integer,0), (Parentheses,)), (Parentheses,{), (Keyword,return), (BoolValue,true), (Semicolon,;), (Parentheses,})]";
     std::string incorrectOutput = "Error! Missing Semicolon";
     std::string incorrectOutput2 = "Error! Unknown token type: brr";
     std::string incorrectOutput3 = "Error! Invalid assignment";
     std::string incorrectOutput4 = "Error! Missing Parentheses";
     std::string incorrectOutput5 = "Error! Incompatible types";
+    std::string incorrectOutput6 = "Error! Function return type mismatch";
+    std::string incorrectOutput7 = "Error! Division by zero";
+    std::string incorrectOutput8 = "Error! Array index out of bounds";
 
     //outputs of the inputs will be compared to the correct output. If they match, the test passes. If not, it fails.
-    std::string output1 = RunLexerTest(input1);
+    //std::string output1 = RunLexerTest(input1);
+    std::string output1 = RunLexerTestHardCoded(input1);
     std::string output2 = RunLexerTestHardCoded(input2);
     std::string output3 = RunLexerTestHardCoded(input3);
     std::string output4 = RunLexerTestHardCoded(input4);
     std::string output5 = RunLexerTestHardCoded(input5);
     std::string output6 = RunLexerTestHardCoded(input6);
-    std::string output7 = RunLexerTest(input7);
+    //std::string output7 = RunLexerTest(input7);
+    std::string output7 = RunLexerTestHardCoded(input7);
     std::string output8 = RunLexerTestHardCoded(input8);
     std::string output9 = RunLexerTestHardCoded(input9);
     std::string output10 = RunLexerTestHardCoded(input10);
     std::string output11 = RunLexerTestHardCoded(input11);
+    std::string output12 = RunLexerTestHardCoded(input12);
+    std::string output13 = RunLexerTestHardCoded(input13);
+    std::string output14 = RunLexerTestHardCoded(input14);
 
     testReturn passFail; //If you come up with a better name, feel free to change it.
     passFail.passed = 0;
@@ -120,6 +132,27 @@ testReturn lexerTests(){
     } else {
         passFail.failed++;
         passFail.errorMessages.push_back("Test 11 failed: Expected " + incorrectOutput5 + " but got " + output11 + "\n");
+    }
+
+    if (output12 == incorrectOutput6) {
+        passFail.passed++;
+    } else {
+        passFail.failed++;
+        passFail.errorMessages.push_back("Test 12 failed: Expected " + incorrectOutput6 + " but got " + output12 + "\n");
+    }
+
+    if (output13 == incorrectOutput7) {
+        passFail.passed++;
+    } else {
+        passFail.failed++;
+        passFail.errorMessages.push_back("Test 13 failed: Expected " + incorrectOutput7 + " but got " + output13 + "\n");
+    }
+
+    if (output14 == incorrectOutput8) {
+        passFail.passed++;
+    } else {
+        passFail.failed++;
+        passFail.errorMessages.push_back("Test 14 failed: Expected " + incorrectOutput8 + " but got " + output14 + "\n");
     }
 
     passFail.errorMessages.push_back(""); //Add an empty string to the error vector.
