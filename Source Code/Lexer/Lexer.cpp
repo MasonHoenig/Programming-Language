@@ -3,9 +3,10 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "Lexer.h"
 
 //Lexer
-enum class TokenType {
+/*enum class TokenType {
 	Keyword,
 	VarType,
 	VarName,
@@ -120,7 +121,7 @@ private:
         } else {
             while (returnPos < input.length() - 1) {
                 if (input[returnPos] == '*' && input[returnPos + 1] == '/') {
-                    return returnPos + 2; // Return position after the closing */
+                    return returnPos + 2; // Return position after the closing comment
                 }
             }
         }
@@ -212,7 +213,7 @@ public:
 
         return tokens;
     }
-};
+};*/
 
 std::string getTokenTypeName(TokenType type)
 {
@@ -250,12 +251,11 @@ std::string getTokenTypeName(TokenType type)
     }
 }
 
-// not sure what to return or take as an input
 std::string RunLexerTest(std::string input) {
 	std::string output = "";
 
 	LexicalAnalyzer lexer(input);
-	std::vector<Token> tokens = lexer.tokenize(); //return the vecotr of tokens to the parser
+	std::vector<Token> tokens = lexer.tokenize(); //return the vector of tokens to the parser
 
     if (tokens[tokens.size() - 1].type != TokenType::Semicolon) { //will need to be reworked
         return "Error! Missing Semicolon";
