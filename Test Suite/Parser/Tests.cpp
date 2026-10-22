@@ -18,12 +18,17 @@ std::vector<std::string> errors = {};
 //        └── Value: 1
 void test1(){
     // Call Parser script with above input and compare output with expected output above, update global vars
-    std::string expectedOutput = "Program -- VariableDeclaration - Type: number - Identifier: x - Initializer: LiteralExpression -- Value: 1";
+    std::string expectedOutput = R"(Program
+└── VariableDeclaration
+    ├── Type: number
+    ├── Identifier: x
+    └── Initializer: LiteralExpression
+        └── Value: 1)";
 
-    std::string realOutput = "Test";
+    std::string actualOutput = "Program\n└── VariableDeclaration...";
     std::string error = "Parser Test 1 output does not match";
 
-    if (expectedOutput == realOutput){
+    if (expectedOutput == actualOutput){
         passed += 1;
     } else {
         failed += 1;
