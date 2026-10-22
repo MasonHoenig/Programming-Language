@@ -111,6 +111,22 @@ private:
         }
         return input.substr(start, position - start);
     }
+
+    int GetCommentEndPos(int startPos) {
+        int returnPos = startPos + 2;
+
+        if (returnPos >= input.length()) {
+            return -1; // Invalid comment
+        } else {
+            while (returnPos < input.length() - 1) {
+                if (input[returnPos] == '*' && input[returnPos + 1] == '/') {
+                    return returnPos + 2; // Return position after the closing */
+                }
+            }
+        }
+        
+        return -1;
+    }
     
 public:
     LexicalAnalyzer(const std::string& source):input(source),position(0) {
@@ -128,6 +144,21 @@ public:
             if (isSpace(currentChar)) {
                 position++;
                 continue;
+            }
+
+            //comments
+            if (position + 1 < input.length() && currentChar == '/') {
+                if (input[position + 1] == '/') {
+                    break; //stops reading the input
+                } else if (input[position + 1] == '*') {
+                    position = GetCommentEndPos(position);
+                    if (position == -1) {
+                        tokens.emplace_back(TokenType::UNKNOWN, "NoCommentEnd");
+                        break;
+                    } else if (position >= input.length()) {
+                        break; //stops reading the input
+                    }
+                }
             }
 
             if (isLetter(currentChar)) {
@@ -256,6 +287,12 @@ std::string RunLexerTestHardCoded(std::string input) {
         return "[(VarName,x), (Assign,=), (Parentheses,(), (VarName,x), (Math,+), (Decimal,3.4), (Parentheses,)), (Math,*), (Integer,5), (Semicolon,;)]";
     } else if (input == "if (x >= 0) { return true; }") {
         return "[(Keyword,if), (Parentheses,(), (VarName,x), (Comparison,>=), (Integer,0), (Parentheses,)), (Parentheses,{), (Keyword,return), (BoolValue,true), (Semicolon,;), (Parentheses,})]";
+    } else if (input == "variable number x = 1; // This is a comment") {
+        return "[(Keyword,variable), (VarType,number), (VarName,x), (Assign,=), (Integer,1), (Semicolon,;)]";
+    } else if (input == "variable number x = y /* alread defined */ + 1;") {
+        return "[(Keyword,variable), (VarType,number), (VarName,x), (Assign,=), (VarName,y), (Math,+), (Integer,1), (Semicolon,;)]";
+    } else if (input == "variable number x = y /* alread defined + 1;") {
+        return "Error! Unclosed comment block";
     } else if (input == "variable number x = 1") {
         return "Error! Missing Semicolon";
     } else if (input == "brr number x = 5;") {
