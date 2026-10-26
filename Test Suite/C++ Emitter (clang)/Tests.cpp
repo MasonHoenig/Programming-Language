@@ -10,21 +10,6 @@
 
 // ------ HELPERS ------
 
-static std::string normalize(const std::string& s) {
-    std::string out;
-    bool pendingSpace = false;
-    for (char c : s) {
-        if (std::isspace(static_cast<unsigned char>(c))) {
-            pendingSpace = true;
-            continue;
-        }
-        if(pendingSpace && !out.empty()) out += ' ';
-        pendingSpace = false;
-        out += c;
-    }
-    return out;
-}
-
 static void check (testReturn& result, bool condition, const std::string& testName, const std::string& details = "") {
     if (condition) {
         result.passed++;
