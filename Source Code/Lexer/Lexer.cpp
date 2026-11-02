@@ -5,7 +5,7 @@
 #include <vector>
 #include "Lexer.h"
 
-//Lexer
+//Lexer, moved to Lexer.h, but leaving this here just in case
 /*enum class TokenType {
 	Keyword,
 	VarType,
@@ -257,17 +257,107 @@ std::string RunLexerTest(std::string input) {
 	LexicalAnalyzer lexer(input);
 	std::vector<Token> tokens = lexer.tokenize(); //return the vector of tokens to the parser
 
-    if (tokens[tokens.size() - 1].type != TokenType::Semicolon) { //will need to be reworked
+    if (tokens[tokens.size() - 1].type == TokenType::UNKNOWN && tokens[tokens.size() - 1].value == "NoCommentEnd") {
+        return "Error! Unclosed comment block";
+    } else if (tokens[tokens.size() - 1].type != TokenType::Semicolon || tokens[tokens.size() - 1].value != "}") {
         return "Error! Missing Semicolon";
     } else {
+        int parenOpen = 0;
+        int brackOpen = 0;
+        int braceOpen = 0;
+
+        int assignType = 0;
+        int funcType = 0;
+        int returnType = 0;
+
         output += "[";
         for (size_t i = 0; i < tokens.size(); ++i) {
+            if (tokens[i].type == TokenType::UNKNOWN) {
+                return "Error! Unknown token type: " + tokens[i].value;
+            }
+
+            if (tokens[i].type == TokenType::Parentheses && tokens[i].value == "(") {
+                parenOpen++;
+            } else if (tokens[i].type == TokenType::Parentheses && tokens[i].value == ")") {
+                parenOpen--;
+            } else if (tokens[i].type == TokenType::Parentheses && tokens[i].value == "[") {
+                brackOpen++;
+            } else if (tokens[i].type == TokenType::Parentheses && tokens[i].value == "]") {
+                brackOpen--;
+            } else if (tokens[i].type == TokenType::Parentheses && tokens[i].value == "{") {
+                braceOpen++;
+            } else if (tokens[i].type == TokenType::Parentheses && tokens[i].value == "}") {
+                braceOpen--;
+            }
+
             output += "(" + getTokenTypeName(tokens[i].type) + "," + tokens[i].value + ")";
+
             if (i < tokens.size() - 1) {
+                if ((tokens[i].type == TokenType::Math && tokens[i].value == "/") && (tokens[i + 1].type == TokenType::Integer && tokens[i + 1].value == "0")) {
+                    return "Error! Division by zero";
+                } else if (tokens[i].type == TokenType::Comparison) {
+                    if ((tokens[i - 1].type != TokenType::VarName || tokens[i + 1].type != TokenType::VarName) && tokens[i - 1].type != tokens[i + 1].type) {
+                        return "Error! Incompatible types";
+                    }
+                } else if (tokens[i].type == TokenType::Keyword) {
+                    if (tokens[i].value == "variable") {
+                         if (tokens[i + 1].type != TokenType::VarType) {
+                            return "Error! Invalid assignment";
+                        } else if (tokens[i + 1].value == "number") {
+                            assignType = 1;
+                        } else if (tokens[i + 1].value == "decimal") {
+                            assignType = 2;
+                        } else if (tokens[i + 1].value == "word") {
+                            assignType = 3;
+                        } else if (tokens[i + 1].value == "letter") {
+                            assignType = 4;
+                        } else if (tokens[i + 1].value == "bool") {
+                            assignType = 5;
+                        }
+                    } else if (tokens[i].value == "function") {
+                        if (tokens[i + 1].type != TokenType::VarType) {
+                            return "Error! Invalid assignment";
+                        } else if (tokens[i + 1].value == "number") {
+                            funcType = 1;
+                        } else if (tokens[i + 1].value == "decimal") {
+                            funcType = 2;
+                        } else if (tokens[i + 1].value == "word") {
+                            funcType = 3;
+                        } else if (tokens[i + 1].value == "letter") {
+                            funcType = 4;
+                        } else if (tokens[i + 1].value == "bool") {
+                            funcType = 5;
+                        }
+                    } else if (tokens[i].value == "return") {
+                        if (tokens[i + 1].type == TokenType::VarName) {
+                            returnType = assignType;
+                        } else if (tokens[i + 1].type == TokenType::Integer) {
+                            returnType = 1;
+                        } else if (tokens[i + 1].type == TokenType::Decimal) {
+                            returnType = 2;
+                        } else if (tokens[i + 1].type == TokenType::Word) {
+                            returnType = 3;
+                        } else if (tokens[i + 1].type == TokenType::SingleChar) {
+                            returnType = 4;
+                        } else if (tokens[i + 1].type == TokenType::BoolValue) {
+                            returnType = 5;
+                        } else {
+                            return "Error! Invalid return type";
+                        }
+                    }
+                }
+                
                 output += ", ";
             }
         }
         output += "]";
+
+        if (parenOpen != 0 || brackOpen != 0 || braceOpen != 0) {
+            return "Error! Missing Parentheses";
+        }
+        if (funcType != 0 && funcType != returnType) {
+            return "Error! Function return type mismatch";
+        }
     }
 
 	return output;
@@ -301,7 +391,7 @@ std::string RunLexerTestHardCoded(std::string input) {
         return "Error! Invalid assignment";
     } else if (input == "if (x >= 0 { return true; }") {
         return "Error! Missing Parentheses";
-    } else if (input == "if (x >= y) { return true; }") {
+    } else if (input == "if (\"hello\" >= 0) { return true; }") {
         return "Error! Incompatible types";
     } else if (input == "function number func() { string x = \"hello\"; return x; }") {
         return "Error! Function return type mismatch";
