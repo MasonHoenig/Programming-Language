@@ -29,7 +29,7 @@ void runTests(){
     std::cout << "Tests passed: " << testArray[1].passed << std::endl;
     std::cout << "Tests failed: " << testArray[1].failed << std::endl;
     std::cout << "Error messages:" << std::endl;
-    for (const auto &message : testArray[0].errorMessages)
+    for (const auto &message : testArray[1].errorMessages)
     {
         std::cout << message << std::endl;
     }
@@ -40,7 +40,7 @@ void runTests(){
     std::cout << "Tests passed: " << testArray[2].passed << std::endl;
     std::cout << "Tests failed: " << testArray[2].failed << std::endl;
     std::cout << "Error messages:" << std::endl;
-    for (const auto &message : testArray[0].errorMessages)
+    for (const auto &message : testArray[2].errorMessages)
     {
         std::cout << message << std::endl;
     }
@@ -51,7 +51,7 @@ void runTests(){
     std::cout << "Tests passed: " << testArray[3].passed << std::endl;
     std::cout << "Tests failed: " << testArray[3].failed << std::endl;
     std::cout << "Error messages:" << std::endl;
-    for (const auto &message : testArray[0].errorMessages)
+    for (const auto &message : testArray[3].errorMessages)
     {
         std::cout << message << std::endl;
     }
@@ -62,7 +62,7 @@ void runTests(){
     std::cout << "Tests passed: " << testArray[4].passed << std::endl;
     std::cout << "Tests failed: " << testArray[4].failed << std::endl;
     std::cout << "Error messages:" << std::endl;
-    for (const auto &message : testArray[0].errorMessages)
+    for (const auto &message : testArray[4].errorMessages)
     {
         std::cout << message << std::endl;
     }
@@ -73,7 +73,7 @@ void runTests(){
     std::cout << "Tests passed: " << testArray[5].passed << std::endl;
     std::cout << "Tests failed: " << testArray[5].failed << std::endl;
     std::cout << "Error messages:" << std::endl;
-    for (const auto &message : testArray[0].errorMessages)
+    for (const auto &message : testArray[5].errorMessages)
     {
         std::cout << message << std::endl;
     }
