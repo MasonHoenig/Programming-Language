@@ -132,7 +132,6 @@ public:
         initVarTypes();
     }
 
-	//Copy/pasted from the tutorial I followed with minor tweaks. Will definitly need fixing.
 	std::vector<Token> tokenize() {
         std::vector<Token> tokens;
 
@@ -156,6 +155,7 @@ public:
                     } else if (position >= input.length()) {
                         break; //stops reading the input
                     }
+                    currentChar = input[position];
                 }
             }
 
@@ -167,8 +167,16 @@ public:
                     tokens.emplace_back(TokenType::VarType, word);
                 } else if (boolTypes.find(word) != boolTypes.end()) {
                     tokens.emplace_back(TokenType::BoolValue, word);
-                } else {
+                } else if (tokens.size() > 0 && tokens.back().type == TokenType::VarType) {
                     tokens.emplace_back(TokenType::VarName, word);
+                } else if (tokens.size() > 0 && tokens.back().type == TokenType::Assign) {
+                    if (word.length() == 1) {
+                        tokens.emplace_back(TokenType::SingleChar, word);
+                    } else {
+                        tokens.emplace_back(TokenType::Word, word);
+                    }
+                } else {
+                    tokens.emplace_back(TokenType::UNKNOWN, word);
                 }
             } else if (isNumber(currentChar)) {
                 std::string number = getNextNumber();
@@ -192,8 +200,7 @@ public:
             } else if (currentChar == '\'' || currentChar == '\"') {
                 tokens.emplace_back(TokenType::Quote, std::string(1, currentChar));
                 position++;
-            // PROBLEM: == won't be checked
-            } else if (currentChar == '<' || currentChar == '>' || currentChar == '=' || currentChar == '!') { 
+            } else if (currentChar == '<' || currentChar == '>' || currentChar == '!') { 
                 std::string comparisonOp(1, currentChar);
                 position++;
                 if (position < input.length() && input[position] == '=') {
