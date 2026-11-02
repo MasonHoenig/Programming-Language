@@ -2,10 +2,6 @@
 #include "../Run_Tests.h"
 // Return the number of tests passed and failed. All error reporting should be handled by adding the error message to the provided vector.
 
-int passed = 0;
-int failed = 0;
-std::vector<std::string> errors = {};
-
 //-----Test 1----- 
 // Source Code = x=1;
 // Lexer Input: [(Keyword, variable), (VarType, number), (VarName, "x"), (Assign, "="), (Integer, "1"), (Semicolon, ";")]
@@ -16,7 +12,7 @@ std::vector<std::string> errors = {};
 //    ├── Identifier: x
 //    └── Initializer: LiteralExpression
 //        └── Value: 1
-void test1(){
+void test1(int &passed, int &failed, std::vector<std::string> &errors){
     // Call Parser script with above input and compare output with expected output above, update global vars
     std::string expectedOutput = R"(Program
 └── VariableDeclaration
@@ -37,9 +33,15 @@ void test1(){
 
 }
 
+
+
 testReturn parserTests(){ // This function is called and returns the struct. I will call each test as a function and use global vars to return
 
-    test1();
+    int passed = 0;
+    int failed = 0;
+    std::vector<std::string> errors = {};
+
+    test1(passed,failed,errors);
 
     testReturn passFail; 
     passFail.passed = passed;
