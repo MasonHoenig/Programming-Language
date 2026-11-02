@@ -1,3 +1,0 @@
-Hi there! 
-Git requires that a folder not be empty to track its creation. 
-Thus, this file is a placeholder for the actual code file that someobody will write in this folder.
