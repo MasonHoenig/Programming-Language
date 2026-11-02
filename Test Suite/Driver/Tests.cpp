@@ -6,19 +6,11 @@ int passed = 0;
 int failed = 0;
 
 
-/*void driverTest(){
-    if (expectedOuput == currentOutput){
-        passed += 1;
-    } else {
-    failed += 1;
-    }
-} */
-
 void syntaxErrorTest(){ // missing semi colon
     std::string input = R"(
     int main(){
-        int x = 5
-        return 0
+        int x = 5;
+        return 0;
          }
     )";
 }
@@ -28,7 +20,7 @@ void runtimeErrorTest(){ // tests for segmentation error, pointer location does 
     int main(){
         int*ptr = nullptr;
         *ptr = 10;
-        return 0
+        return 0;
          }
     )";
 }
@@ -38,9 +30,13 @@ void sematicErrorTest(){ // tests for type mismatch
     std::string input = R"(
     int main(){
         int y = "hello";
-        return 0
+        return 0;
          }
     )";
+}
+
+void ioTestErrorTest(){ // tests for missing/empty input file
+    std::string input = "fakeMissingFile.cpp":
 }
 
 
