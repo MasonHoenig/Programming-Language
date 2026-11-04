@@ -25,6 +25,9 @@ private:
     VariableDeclaration* parseVariableDeclaration();
     IfStatement* parseIfStatement();
     WhileLoop* parseWhileLoop();
+    ArrayDeclaration* parseArrayDeclaration();
+    FunctionDeclaration* parseFunctionDeclaration();
+    ForLoop* parseForLoop();
 
     //Swine Specific Parsing
     NodeDeclaration* parseNodeDeclaration(); // Ex: Node Castle { ... }
@@ -34,6 +37,11 @@ private:
     Expression* parseExpression();
     Expression* parseComparison();
     Expression* parseArithmetic();
+
+    Expression* parseUnary(); 
+    Expression* parseFunctionCall(std::string functionName); 
+    Expression* parseArrayAccess(std::string arrayName); 
+
     Expression* parsePrimary(); // For Literals
 
 public:
