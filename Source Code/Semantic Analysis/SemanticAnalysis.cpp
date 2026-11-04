@@ -1,9 +1,7 @@
-class ASTNode{}
-class printNode : public ASTNode{}
-class identiyNode : public ASTNode{}
+#include "SemanticAnalysis.h"
 
 std::string runSemTest(ASTNode input) {
-
+    
 
     return "";
 }
