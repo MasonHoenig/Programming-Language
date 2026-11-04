@@ -28,6 +28,8 @@ std::string getTokenTypeName(TokenType type)
 		return "Assign";
     case TokenType::Math:
         return "Math";
+    case TokenType::Quote:
+        return "Quote";
 	case TokenType::Semicolon:
         return "Semicolon";
     case TokenType::Parentheses:
@@ -47,10 +49,14 @@ std::string RunLexerTest(std::string input) {
 	LexicalAnalyzer lexer(input);
 	std::vector<Token> tokens = lexer.tokenize(); //return the vector of tokens to the parser
 
+    if (tokens.empty()) {
+        return output;
+    }
+
     if (tokens[tokens.size() - 1].type == TokenType::UNKNOWN && tokens[tokens.size() - 1].value == "NoCommentEnd") {
-        return "Error! Unclosed comment block";
-    } else if (tokens[tokens.size() - 1].type != TokenType::Semicolon || tokens[tokens.size() - 1].value != "}") {
-        return "Error! Missing Semicolon";
+        return "Error! Unclosed comment block: " + input;
+    } else if (tokens[tokens.size() - 1].type != TokenType::Semicolon && tokens[tokens.size() - 1].value != "}") {
+        return "Error! Missing Semicolon: " + input;
     } else {
         int parenOpen = 0;
         int brackOpen = 0;
@@ -63,7 +69,7 @@ std::string RunLexerTest(std::string input) {
         output += "[";
         for (size_t i = 0; i < tokens.size(); ++i) {
             if (tokens[i].type == TokenType::UNKNOWN) {
-                return "Error! Unknown token type: " + tokens[i].value;
+                return "Error! Unknown token type: " + tokens[i].value + ": " + input;
             }
 
             if (tokens[i].type == TokenType::Parentheses && tokens[i].value == "(") {
@@ -80,19 +86,45 @@ std::string RunLexerTest(std::string input) {
                 braceOpen--;
             }
 
+            switch (assignType) {
+                case 0:
+                    break;
+                case 1:
+                case 2:
+                    if (tokens[i].type == TokenType::Word || tokens[i].type == TokenType::SingleChar || tokens[i].type == TokenType::BoolValue) {
+                        return "Error! Invalid assignment: " + input;
+                    }
+                    break;
+                case 3:
+                    if (tokens[i].type == TokenType::Integer|| tokens[i].type == TokenType::Decimal || tokens[i].type == TokenType::BoolValue) {
+                        return "Error! Invalid assignment: " + input;
+                    }
+                    break;
+                case 4:
+                    if (tokens[i].type == TokenType::Integer|| tokens[i].type == TokenType::Decimal || tokens[i].type == TokenType::Word || tokens[i].type == TokenType::BoolValue) {
+                        return "Error! Invalid assignment: " + input;
+                    }
+                    break;
+                case 5:
+                    if (tokens[i].type == TokenType::Integer|| tokens[i].type == TokenType::Decimal || tokens[i].type == TokenType::Word || tokens[i].type == TokenType::SingleChar) {
+                        return "Error! Invalid assignment: " + input;
+                    }
+                    break;
+            }
+
             output += "(" + getTokenTypeName(tokens[i].type) + "," + tokens[i].value + ")";
 
             if (i < tokens.size() - 1) {
                 if ((tokens[i].type == TokenType::Math && tokens[i].value == "/") && (tokens[i + 1].type == TokenType::Integer && tokens[i + 1].value == "0")) {
-                    return "Error! Division by zero";
+                    return "Error! Division by zero: " + input;
                 } else if (tokens[i].type == TokenType::Comparison) {
-                    if ((tokens[i - 1].type != TokenType::VarName || tokens[i + 1].type != TokenType::VarName) && tokens[i - 1].type != tokens[i + 1].type) {
-                        return "Error! Incompatible types";
+                    if (tokens[i - 1].type != TokenType::VarName && tokens[i + 1].type != TokenType::VarName && tokens[i - 1].type != tokens[i + 1].type) {
+                        return "Error! Incompatible types: " + input;
                     }
                 } else if (tokens[i].type == TokenType::Keyword) {
                     if (tokens[i].value == "variable") {
-                         if (tokens[i + 1].type != TokenType::VarType) {
-                            return "Error! Invalid assignment";
+                        if (tokens[i + 1].type != TokenType::VarType) {
+                            return "Error! Invalid assignment: " + input;
                         } else if (tokens[i + 1].value == "number") {
                             assignType = 1;
                         } else if (tokens[i + 1].value == "decimal") {
@@ -106,7 +138,7 @@ std::string RunLexerTest(std::string input) {
                         }
                     } else if (tokens[i].value == "function") {
                         if (tokens[i + 1].type != TokenType::VarType) {
-                            return "Error! Invalid assignment";
+                            return "Error! Invalid assignment: " + input;
                         } else if (tokens[i + 1].value == "number") {
                             funcType = 1;
                         } else if (tokens[i + 1].value == "decimal") {
@@ -132,7 +164,7 @@ std::string RunLexerTest(std::string input) {
                         } else if (tokens[i + 1].type == TokenType::BoolValue) {
                             returnType = 5;
                         } else {
-                            return "Error! Invalid return type";
+                            return "Error! Invalid return type: " + input;
                         }
                     }
                 }
@@ -143,13 +175,13 @@ std::string RunLexerTest(std::string input) {
         output += "]";
 
         if (parenOpen != 0 || brackOpen != 0 || braceOpen != 0) {
-            return "Error! Missing Parentheses";
+            return "Error! Missing Parentheses: " + input;
         }
         if (funcType != 0 && funcType != returnType) {
-            return "Error! Function return type mismatch";
+            return "Error! Function return type mismatch: " + input;
         }
     }
-
+    
 	return output;
 }
 

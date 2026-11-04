@@ -25,8 +25,9 @@ enum class TokenType {
 struct Token {
 	TokenType type;
 	std::string value;
+    int col; //for tracking the position in error messages
 	
-	Token(TokenType t, const std::string& v):type(t),value(v) {}
+	Token(TokenType t, const std::string& v, const int c):type(t),value(v),col(c) {}
 };
 
 class LexicalAnalyzer {
@@ -44,6 +45,7 @@ private:
         keywords["if"] = TokenType::Keyword;
         keywords["else"] = TokenType::Keyword;
         keywords["while"] = TokenType::Keyword;
+        keywords["for"] = TokenType::Keyword;
     }
 
     void initVarTypes() {
@@ -120,11 +122,27 @@ private:
                 if (input[returnPos] == '*' && input[returnPos + 1] == '/') {
                     return returnPos + 2; // Return position after the closing */
                 }
+                returnPos++;
             }
         }
         
         return -1;
     }
+
+    bool IsExistingVar(std::vector<Token> tokens, std::string name) {
+        for (int i = 0; i < tokens.size(); i++) {
+            if (tokens[i].type == TokenType::VarName && tokens[i].value == name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /*Token rewriteToVarName(Token var) {
+        
+        return var;
+    }*/
     
 public:
     LexicalAnalyzer(const std::string& source):input(source),position(0) {
@@ -134,6 +152,7 @@ public:
 
 	std::vector<Token> tokenize() {
         std::vector<Token> tokens;
+        bool isEquation = false;
 
         while (position < input.length()) {
             char currentChar = input[position];
@@ -150,55 +169,76 @@ public:
                 } else if (input[position + 1] == '*') {
                     position = GetCommentEndPos(position);
                     if (position == -1) {
-                        tokens.emplace_back(TokenType::UNKNOWN, "NoCommentEnd");
+                        tokens.emplace_back(TokenType::UNKNOWN, "NoCommentEnd", input.length());
                         break;
                     } else if (position >= input.length()) {
                         break; //stops reading the input
                     }
                     currentChar = input[position];
+                    if (isSpace(currentChar)) {
+                        position++;
+                        continue;
+                    }
                 }
             }
 
             if (isLetter(currentChar)) {
                 std::string word = getNextWord();
                 if (keywords.find(word) != keywords.end()) {
-                    tokens.emplace_back(TokenType::Keyword, word);
+                    tokens.emplace_back(TokenType::Keyword, word, position);
 				} else if (varTypes.find(word) != varTypes.end()) {
-                    tokens.emplace_back(TokenType::VarType, word);
+                    tokens.emplace_back(TokenType::VarType, word, position);
                 } else if (boolTypes.find(word) != boolTypes.end()) {
-                    tokens.emplace_back(TokenType::BoolValue, word);
-                } else if (tokens.size() > 0 && tokens.back().type == TokenType::VarType) {
-                    tokens.emplace_back(TokenType::VarName, word);
-                } else if (tokens.size() > 0 && tokens.back().type == TokenType::Assign) {
+                    tokens.emplace_back(TokenType::BoolValue, word, position);
+                } else if ((tokens.size() > 0 && (tokens.back().type == TokenType::VarType || tokens.back().type == TokenType::Comparison)) || (isEquation && tokens.back().type != TokenType::Quote)) {
+                    tokens.emplace_back(TokenType::VarName, word, position);
+                } else if (tokens.size() > 0 && tokens.back().type == TokenType::Quote) {
                     if (word.length() == 1) {
-                        tokens.emplace_back(TokenType::SingleChar, word);
+                        tokens.emplace_back(TokenType::SingleChar, word, position);
                     } else {
-                        tokens.emplace_back(TokenType::Word, word);
+                        tokens.emplace_back(TokenType::Word, word, position);
                     }
                 } else {
-                    tokens.emplace_back(TokenType::UNKNOWN, word);
+                    if (IsExistingVar(tokens, word)) {
+                        tokens.emplace_back(TokenType::VarName, word, position);
+                    } else {
+                        tokens.emplace_back(TokenType::UNKNOWN, word, position);
+                    }
                 }
             } else if (isNumber(currentChar)) {
                 std::string number = getNextNumber();
 				//what is npos?
                 if (number.find('.') != std::string::npos) {
-					tokens.emplace_back(TokenType::Decimal, number);
+					tokens.emplace_back(TokenType::Decimal, number, position);
                 } else {
-                    tokens.emplace_back(TokenType::Integer, number);
+                    tokens.emplace_back(TokenType::Integer, number, position);
                 }
             } else if (currentChar == '=') {
                 if (position + 1 < input.length() && input[position + 1] == '=') {
-                    tokens.emplace_back(TokenType::Comparison, "==");
+                    if (tokens.size() > 0 && tokens.back().type == TokenType::UNKNOWN) {
+                        Token rewrite = tokens.back();
+                        tokens.pop_back();
+                        rewrite.type = TokenType::VarName;
+                        tokens.emplace_back(rewrite);
+                    }
+                    tokens.emplace_back(TokenType::Comparison, "==", position);
                     position += 2;
                 } else {
-                    tokens.emplace_back(TokenType::Assign, std::string(1, currentChar));
+                    if (tokens.size() == 1 && tokens.back().type == TokenType::UNKNOWN) {
+                        Token rewrite = tokens.back();
+                        tokens.pop_back();
+                        rewrite.type = TokenType::VarName;
+                        tokens.emplace_back(rewrite);
+                    }
+                    tokens.emplace_back(TokenType::Assign, std::string(1, currentChar), position);
                     position++;
+                    isEquation = true;
                 }
             } else if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' || currentChar == '%') {
-                tokens.emplace_back(TokenType::Math, std::string(1, currentChar));
+                tokens.emplace_back(TokenType::Math, std::string(1, currentChar), position);
                 position++;
             } else if (currentChar == '\'' || currentChar == '\"') {
-                tokens.emplace_back(TokenType::Quote, std::string(1, currentChar));
+                tokens.emplace_back(TokenType::Quote, std::string(1, currentChar), position);
                 position++;
             } else if (currentChar == '<' || currentChar == '>' || currentChar == '!') { 
                 std::string comparisonOp(1, currentChar);
@@ -207,15 +247,21 @@ public:
                     comparisonOp += '=';
                     position++;
                 }
-                tokens.emplace_back(TokenType::Comparison, comparisonOp);
+                if (tokens.size() > 0 && tokens.back().type == TokenType::UNKNOWN) {
+                    Token rewrite = tokens.back();
+                    tokens.pop_back();
+                    rewrite.type = TokenType::VarName;
+                    tokens.emplace_back(rewrite);
+                }
+                tokens.emplace_back(TokenType::Comparison, comparisonOp, position);
             } else if (currentChar == ';') {
-				tokens.emplace_back(TokenType::Semicolon, std::string(1, currentChar));
+				tokens.emplace_back(TokenType::Semicolon, std::string(1, currentChar), position);
 				position++;
             } else if (currentChar == '(' || currentChar == ')' || currentChar == '{' || currentChar == '}' || currentChar == '[' || currentChar == ']') {
-                tokens.emplace_back(TokenType::Parentheses, std::string(1, currentChar));
+                tokens.emplace_back(TokenType::Parentheses, std::string(1, currentChar), position);
                 position++;
             } else {
-                tokens.emplace_back(TokenType::UNKNOWN, std::string(1, currentChar));
+                tokens.emplace_back(TokenType::UNKNOWN, std::string(1, currentChar), position);
                 position++;
             }
         }

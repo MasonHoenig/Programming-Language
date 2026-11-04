@@ -16,7 +16,7 @@ testReturn lexerTests(){
     std::string input9 = "variable number x = \"hello\";"; //invalid input, number cannot be assigned a string
     std::string input10 = "if (x >= 0 { return true; }"; //invalid input, missing )
     std::string input11 = "if (\"hello\" >= 0) { return true; }"; //invalid input, imcompatible types
-    std::string input12 = "function number func() { string x = \"hello\"; return x; }"; //invalid input, function return type is number but returns a string
+    std::string input12 = "function number func() { word x = \"hello\"; return x; }"; //invalid input, function return type is number but returns a string
     std::string input13 = "variable decimal d = 3.14 / 0;"; //invalid input, division by zero
     //std::string input14 = "variable number x = arr[5];"; //invalid input, assumes arr has < 5 elements
 
@@ -33,15 +33,18 @@ testReturn lexerTests(){
     std::string correctOutput6 = "[(Keyword,if), (Parentheses,(), (VarName,x), (Comparison,>=), (Integer,0), (Parentheses,)), (Parentheses,{), (Keyword,return), (BoolValue,true), (Semicolon,;), (Parentheses,})]";
     std::string correctOutput7 = "[(Keyword,variable), (VarType,number), (VarName,x), (Assign,=), (Integer,1), (Semicolon,;)]";
     std::string correctOutput8 = "[(Keyword,variable), (VarType,number), (VarName,x), (Assign,=), (VarName,y), (Math,+), (Integer,1), (Semicolon,;)]";
-    std::string incorrectOutput = "Error! Missing Semicolon";
-    std::string incorrectOutput2 = "Error! Unknown token type: brr";
-    std::string incorrectOutput3 = "Error! Invalid assignment";
-    std::string incorrectOutput4 = "Error! Missing Parentheses";
-    std::string incorrectOutput5 = "Error! Incompatible types";
-    std::string incorrectOutput6 = "Error! Function return type mismatch";
-    std::string incorrectOutput7 = "Error! Division by zero";
+    
+    //Collum number will be added when all tests pass
+    //IDEA: No collum number, errors read: Error! <error type>: <print line>
+    std::string incorrectOutput = "Error! Missing Semicolon: variable number x = 1"; //Col 21
+    std::string incorrectOutput2 = "Error! Unknown token type: brr: brr number x = 5;"; //Col 1
+    std::string incorrectOutput3 = "Error! Invalid assignment: variable number x = \"hello\";"; //Col 22, unsure if Col is right
+    std::string incorrectOutput4 = "Error! Missing Parentheses: if (x >= 0 { return true; }"; //Col 27
+    std::string incorrectOutput5 = "Error! Incompatible types: if (\"hello\" >= 0) { return true; }"; //Col is supposed to be "return"'s Col, not sure what it is
+    std::string incorrectOutput6 = "Error! Function return type mismatch: function number func() { word x = \"hello\"; return x; }";
+    std::string incorrectOutput7 = "Error! Division by zero: variable decimal d = 3.14 / 0;";
     //std::string incorrectOutput8 = "Error! Array index out of bounds";
-    std::string incorrectOutput9 = "Error! Unclosed comment block";
+    std::string incorrectOutput9 = "Error! Unclosed comment block: variable number x = y /* alread defined + 1;";
 
     //outputs of the inputs will be compared to the correct output. If they match, the test passes. If not, it fails.
     std::string output1 = RunLexerTest(input1);
