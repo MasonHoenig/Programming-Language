@@ -13,7 +13,7 @@ void test1(int &passed, int &failed, std::vector<std::string> &errors){
     └── Initializer: LiteralExpression
         └── Value: 1)";
 
-    std::string actualOutput = "Placeholder Tree"; // Replace with myParser.PrintTree(tree)
+    std::string actualOutput = "Placeholder"; // Replace with myParser.PrintTree(tree)
     std::string error = "Parser Test 1 (Number Declaration) output does not match";
 
     if (expectedOutput == actualOutput){
@@ -35,7 +35,7 @@ void test2(int &passed, int &failed, std::vector<std::string> &errors){
     └── Initializer: LiteralExpression
         └── Value: "hello world!")";
 
-    std::string actualOutput = "Placeholder Tree"; // Replace with myParser.PrintTree(tree)
+    std::string actualOutput = "Placeholder"; // Replace with myParser.PrintTree(tree)
     std::string error = "Parser Test 2 (Word Declaration) output does not match";
 
     if (expectedOutput == actualOutput){
@@ -62,7 +62,7 @@ void test3(int &passed, int &failed, std::vector<std::string> &errors){
             ├── Operator: *
             └── Right: LiteralExpression (2))";
 
-    std::string actualOutput = "Placeholder Tree"; // Replace with myParser.PrintTree(tree)
+    std::string actualOutput = "Placeholder"; // Replace with myParser.PrintTree(tree)
     std::string error = "Parser Test 3 (Operator Precedence) output does not match";
 
     if (expectedOutput == actualOutput){
@@ -89,7 +89,7 @@ void test4(int &passed, int &failed, std::vector<std::string> &errors){
             ├── Operator: =
             └── Right: LiteralExpression (1))";
 
-    std::string actualOutput = "Placeholder Tree"; // Replace with myParser.PrintTree(tree)
+    std::string actualOutput = "Placeholder"; // Replace with myParser.PrintTree(tree)
     std::string error = "Parser Test 4 (If Statement) output does not match";
 
     if (expectedOutput == actualOutput){
@@ -119,7 +119,7 @@ void test5(int &passed, int &failed, std::vector<std::string> &errors){
                 ├── Operator: +
                 └── Right: LiteralExpression (1))";
 
-    std::string actualOutput = "Placeholder Tree"; // Replace with myParser.PrintTree(tree)
+    std::string actualOutput = "Placeholder"; // Replace with myParser.PrintTree(tree)
     std::string error = "Parser Test 5 (While Loop) output does not match";
 
     if (expectedOutput == actualOutput){
@@ -142,7 +142,7 @@ void test6(int &passed, int &failed, std::vector<std::string> &errors){
                 ├── DisplayText: LiteralExpression ("Wait")
                 └── Transition: GotoStatement (Castle))";
 
-    std::string actualOutput = "Placeholder Tree"; // Replace with myParser.PrintTree(tree)
+    std::string actualOutput = "Placeholder"; // Replace with myParser.PrintTree(tree)
     std::string error = "Parser Test 6 (Node and OptionSet) output does not match";
 
     if (expectedOutput == actualOutput){
@@ -167,7 +167,7 @@ void test7(int &passed, int &failed, std::vector<std::string> &errors){
         ├── LiteralExpression (3)
         └── LiteralExpression (4))";
 
-    std::string actualOutput = "Placeholder Tree"; // Replace with myParser.PrintTree(tree)
+    std::string actualOutput = "Placeholder"; // Replace with myParser.PrintTree(tree)
     std::string error = "Parser Test 7 (Arrays) output does not match";
 
     if (expectedOutput == actualOutput){
@@ -193,7 +193,7 @@ void test8(int &passed, int &failed, std::vector<std::string> &errors){
             └── Arguments:
                 └── LiteralExpression ("test"))";
 
-    std::string actualOutput = "Placeholder Tree"; // Replace with myParser.PrintTree(tree)
+    std::string actualOutput = "Placeholder"; // Replace with myParser.PrintTree(tree)
     std::string error = "Parser Test 8 (Functions) output does not match";
 
     if (expectedOutput == actualOutput){
@@ -231,7 +231,7 @@ void test9(int &passed, int &failed, std::vector<std::string> &errors){
             └── Arguments:
                 └── IdentifierExpression (y))";
 
-    std::string actualOutput = "Placeholder Tree"; // Replace with myParser.PrintTree(tree)
+    std::string actualOutput = "Placeholder"; // Replace with myParser.PrintTree(tree)
     std::string error = "Parser Test 9 (For Loops) output does not match";
 
     if (expectedOutput == actualOutput){
@@ -259,7 +259,7 @@ void test10(int &passed, int &failed, std::vector<std::string> &errors){
     │       └── Right: LiteralExpression (1)
     └── ThenBranch: Empty)";
 
-    std::string actualOutput = "Placeholder Tree"; // Replace with myParser.PrintTree(tree)
+    std::string actualOutput = "Placeholder"; // Replace with myParser.PrintTree(tree)
     std::string error = "Parser Test 10 (Logic) output does not match";
 
     if (expectedOutput == actualOutput){
