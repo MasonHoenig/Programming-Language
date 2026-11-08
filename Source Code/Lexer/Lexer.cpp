@@ -51,10 +51,17 @@ std::vector<Token> RunLexerProgram(const std::string& filePath) {
     int line = 1;
     std::string programLine;
     std::ifstream file(filePath);
+    bool commenting = false;
 
     if (file.is_open()) {
         while (getline (file, programLine)) {
-            std::vector<Token> newLine = RunLexerLine(programLine, line, tokenSet.size());
+            std::vector<Token> newLine = RunLexerLine(programLine, line, tokenSet.size(), commenting);
+            if (newLine.back().type == TokenType::UnclosedComment) {
+                commenting = true;
+                newLine.pop_back();
+            } else {
+                commenting = false;
+            }
 
             for (int i = 0; i < newLine.size(); i++) {
                 tokenSet.push_back(newLine[i]);
@@ -70,7 +77,6 @@ std::vector<Token> RunLexerProgram(const std::string& filePath) {
         }
     }*/
 
-    //put an end of file marker?
     SourceLocation endFileLocation = {line, 0, tokenSet.size()};
     tokenSet.emplace_back(TokenType::EndFileMarker, "0", endFileLocation);
 
@@ -83,12 +89,11 @@ std::vector<Token> RunLexerProgram(const std::string& filePath) {
     }
 }
 
-std::vector<Token> RunLexerLine(std::string input, int line, int vecSize) {
+std::vector<Token> RunLexerLine(std::string input, int line, int vecSize, bool commenting) {
     std::vector<Token> lineSet;
 
     LexicalAnalyzer lexer(input);
-    lineSet = lexer.tokenize(line, vecSize);
-    //Error handeling?
+    lineSet = lexer.tokenize(line, vecSize, commenting);
     //How do multiline comments work?
 
     return lineSet;
@@ -98,7 +103,7 @@ std::string RunLexerTest(std::string input) {
 	std::string output = "";
 
 	LexicalAnalyzer lexer(input);
-	std::vector<Token> tokens = lexer.tokenize(0, 0); //return the vector of tokens to the parser
+	std::vector<Token> tokens = lexer.tokenize(0, 0, false); //return the vector of tokens to the parser
 
     if (tokens.empty()) {
         return output;

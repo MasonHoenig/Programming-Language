@@ -20,6 +20,7 @@ enum class TokenType {
 	Parentheses,
 	Comparison,
     EndFileMarker,
+    UnclosedComment, //Added so the Lexer can read multiline comments properly
 	UNKNOWN, // Added for unrecognized tokens
 };
 
@@ -140,6 +141,7 @@ private:
         return -1;
     }
 
+
     bool IsExistingVar(std::vector<Token> tokens, std::string name) {
         for (int i = 0; i < tokens.size(); i++) {
             if (tokens[i].type == TokenType::VarName && tokens[i].value == name) {
@@ -161,10 +163,18 @@ public:
         initVarTypes();
     }
 
-	std::vector<Token> tokenize(int line, int vecSize) {
+	std::vector<Token> tokenize(int line, int vecSize, bool commenting) {
         std::vector<Token> tokens;
         bool isEquation = false;
         SourceLocation newSL = {line, 0, vecSize};
+
+        if (commenting == true) {
+            position = GetCommentEndPos(0);
+            if (position == -1) {
+                tokens.emplace_back(TokenType::UnclosedComment, "", newSL);
+                return tokens;
+            }
+        }
 
         while (position < input.length()) {
             newSL.column = position;
@@ -183,7 +193,8 @@ public:
                 } else if (input[position + 1] == '*') {
                     position = GetCommentEndPos(position);
                     if (position == -1) {
-                        //tokens.emplace_back(TokenType::UNKNOWN, "NoCommentEnd");
+                        newSL.column = input.size();
+                        tokens.emplace_back(TokenType::UnclosedComment, "", newSL);
                         break;
                     } else if (position >= input.length()) {
                         break; //stops reading the input
