@@ -3,6 +3,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <fstream>
+#include <algorithm>
 #include "Lexer.h"
 
 std::string getTokenTypeName(TokenType type)
@@ -43,11 +45,60 @@ std::string getTokenTypeName(TokenType type)
     }
 }
 
+//assume the file type is correct
+std::vector<Token> RunLexerProgram(const std::string& filePath) {
+    std::vector<Token> tokenSet;
+    int line = 1;
+    std::string programLine;
+    std::ifstream file(filePath);
+
+    if (file.is_open()) {
+        while (getline (file, programLine)) {
+            std::vector<Token> newLine = RunLexerLine(programLine, line, tokenSet.size());
+
+            for (int i = 0; i < newLine.size(); i++) {
+                tokenSet.push_back(newLine[i]);
+            }
+
+            line++;
+        }
+    }
+
+    /*for (int i = 0; i < tokenSet.size(); i++) {
+        if (tokenSet[i].type == TokenType::UNKNOWN) {
+            std::cout << "Unknown token found: " << tokenSet[i].value << " at line " << tokenSet[i].sourceLocal.line << ", column " << tokenSet[i].sourceLocal.column << std::endl;
+        }
+    }*/
+
+    //put an end of file marker?
+    SourceLocation endFileLocation = {line, 0, tokenSet.size()};
+    tokenSet.emplace_back(TokenType::EndFileMarker, "0", endFileLocation);
+
+    //if there's an unkown token, return null
+    if (find(tokenSet.begin(), tokenSet.end(), TokenType::UNKNOWN) != tokenSet.end()) {
+        std::vector<Token> nullVec;
+        return nullVec;
+    } else {
+        return tokenSet;
+    }
+}
+
+std::vector<Token> RunLexerLine(std::string input, int line, int vecSize) {
+    std::vector<Token> lineSet;
+
+    LexicalAnalyzer lexer(input);
+    lineSet = lexer.tokenize(line, vecSize);
+    //Error handeling?
+    //How do multiline comments work?
+
+    return lineSet;
+}
+
 std::string RunLexerTest(std::string input) {
 	std::string output = "";
 
 	LexicalAnalyzer lexer(input);
-	std::vector<Token> tokens = lexer.tokenize(); //return the vector of tokens to the parser
+	std::vector<Token> tokens = lexer.tokenize(0, 0); //return the vector of tokens to the parser
 
     if (tokens.empty()) {
         return output;
