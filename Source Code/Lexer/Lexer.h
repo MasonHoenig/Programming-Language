@@ -55,6 +55,7 @@ private:
         keywords["else"] = TokenType::Keyword;
         keywords["while"] = TokenType::Keyword;
         keywords["for"] = TokenType::Keyword;
+        keywords["print"] = TokenType::Keyword;
         keywords["Node"] = TokenType::Keyword;
         keywords["OptionSet"] = TokenType::Keyword;
         keywords["Option"] = TokenType::Keyword;
