@@ -61,7 +61,7 @@ static std::string escapeForCpp(const std::string& s)
 
 // ----------------------------
 
-std::string VariableDeclaration::variableDeclaration(const TAC& instr, const std::string& source) {
+std::string VariableDeclaration::variableDeclaration(const TAC& instr) {
 	std::string valType;
 	std::string rhs = instr.arg2;
 
