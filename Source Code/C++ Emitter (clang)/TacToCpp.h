@@ -21,7 +21,7 @@ struct VariableDeclaration
     std::unordered_map<std::string, std::string> names;
     std::unordered_map<std::string, std::string> types;
 
-    std::string variableDeclaration(const TAC& instr, const std::string& source);
+    std::string variableDeclaration(const TAC& instr);
 };
 
 std::vector<std::string> emitCpp(const std::vector<TAC>& ir);
