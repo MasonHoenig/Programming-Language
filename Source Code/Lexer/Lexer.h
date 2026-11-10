@@ -11,7 +11,7 @@ enum class TokenType {
 	Integer,
 	Decimal,
 	Word,
-	SingleChar,
+	//SingleChar,
 	BoolValue,
 	Assign,
 	Math,
@@ -35,8 +35,8 @@ struct Token {
 	std::string value;
     SourceLocation sourceLocal;
 	
-	Token(TokenType t, const std::string& v):type(t),value(v) {}
-    //Token(TokenType t, const std::string& v, SourceLocation sl):type(t),value(v),sourceLocal(sl) {}
+	//Token(TokenType t, const std::string& v):type(t),value(v) {}
+    Token(TokenType t, const std::string& v, SourceLocation sl):type(t),value(v),sourceLocal(sl) {}
 };
 
 class LexicalAnalyzer {
@@ -65,7 +65,7 @@ private:
         varTypes["number"] = TokenType::VarType;
         varTypes["decimal"] = TokenType::VarType;
         varTypes["word"] = TokenType::VarType;
-        varTypes["letter"] = TokenType::VarType;
+        //varTypes["letter"] = TokenType::VarType;
         varTypes["bool"] = TokenType::VarType;
         varTypes["void"] = TokenType::VarType; //only for functions
     }
@@ -167,6 +167,8 @@ public:
 	std::vector<Token> tokenize(int line, int vecSize, bool commenting) {
         std::vector<Token> tokens;
         bool isEquation = false;
+        bool quoting = false;
+        std::string newWord = "";
         SourceLocation newSL = {line, 0, vecSize};
 
         if (commenting == true) {
@@ -178,8 +180,32 @@ public:
         }
 
         while (position < input.length()) {
-            newSL.column = position;
-            newSL.offset = vecSize + tokens.size();
+            if (quoting == true) {
+                if (input[position] == '\"') {
+                    if (tokens.size() > 0) {
+                        newSL.column = tokens.back().sourceLocal.column + 1;
+                    } else {
+                        newSL.column = 1;
+                    }
+                    newSL.offset = vecSize + tokens.size();
+                    tokens.emplace_back(TokenType::Word, newWord, newSL);
+
+                    newSL.column += newWord.length();
+                    newSL.offset++;
+
+                    tokens.emplace_back(TokenType::Quote, "\"", newSL);
+
+                    quoting = false;
+                    newWord = "";
+                } else {
+                    newWord += input[position];
+                }
+                position++;
+                continue;
+            }
+
+            newSL.column = position + 1;
+            newSL.offset = vecSize + tokens.size() + 1;
             char currentChar = input[position];
 
             if (isSpace(currentChar)) {
@@ -216,14 +242,15 @@ public:
                     tokens.emplace_back(TokenType::VarType, word, newSL);
                 } else if (boolTypes.find(word) != boolTypes.end()) {
                     tokens.emplace_back(TokenType::BoolValue, word, newSL);
-                } else if ((tokens.size() > 0 && (tokens.back().type == TokenType::VarType || tokens.back().type == TokenType::Comparison)) || (isEquation && tokens.back().type != TokenType::Quote)) {
+                } else if ((tokens.size() > 0 && (tokens.back().type == TokenType::VarType || tokens.back().type == TokenType::Comparison))/* || (isEquation && tokens.back().type != TokenType::Quote)*/) {
                     tokens.emplace_back(TokenType::VarName, word, newSL);
-                } else if (tokens.size() > 0 && tokens.back().type == TokenType::Quote) {
+                /*} else if (tokens.size() > 0 && tokens.back().type == TokenType::Quote) {
                     if (word.length() == 1) {
                         tokens.emplace_back(TokenType::SingleChar, word, newSL);
                     } else {
                         tokens.emplace_back(TokenType::Word, word, newSL);
                     }
+                    tokens.emplace_back(TokenType::Word, word, newSL);*/
                 } else {
                     if (IsExistingVar(tokens, word)) {
                         tokens.emplace_back(TokenType::VarName, word, newSL);
@@ -264,9 +291,16 @@ public:
             } else if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' || currentChar == '%') {
                 tokens.emplace_back(TokenType::Math, std::string(1, currentChar), newSL);
                 position++;
-            } else if (currentChar == '\'' || currentChar == '\"') {
+            // ' removed because no more single characters
+            } else if (currentChar == '\"') {
                 tokens.emplace_back(TokenType::Quote, std::string(1, currentChar), newSL);
                 position++;
+                newWord = "";
+                if (quoting == true) {
+                    quoting = false;
+                } else {
+                    quoting = true;
+                }
             } else if (currentChar == '<' || currentChar == '>' || currentChar == '!') { 
                 std::string comparisonOp(1, currentChar);
                 position++;
