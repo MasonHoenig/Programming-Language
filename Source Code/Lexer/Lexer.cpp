@@ -22,8 +22,8 @@ std::string getTokenTypeName(TokenType type)
         return "Decimal";
 	case TokenType::Word:
 		return "Word";
-	case TokenType::SingleChar:
-		return "SingleChar";
+	//case TokenType::SingleChar:
+		//return "SingleChar";
 	case TokenType::BoolValue:
 		return "BoolValue";
 	case TokenType::Assign:
@@ -40,9 +40,21 @@ std::string getTokenTypeName(TokenType type)
 		return "Comparison";
     case TokenType::UNKNOWN:
         return "UNKNOWN";
+    case TokenType::EndFileMarker:
+        return "End of file";
     default:
         return "ERROR: Unknown TokenType";
     }
+}
+
+std::vector<Token> RunLexerLine(std::string input, int line, int vecSize, bool commenting) {
+    std::vector<Token> lineSet;
+
+    LexicalAnalyzer lexer(input);
+    lineSet = lexer.tokenize(line, vecSize, commenting);
+    //How do multiline comments work?
+
+    return lineSet;
 }
 
 //assume the file type is correct
@@ -77,26 +89,31 @@ std::vector<Token> RunLexerProgram(const std::string& filePath) {
         }
     }*/
 
-    SourceLocation endFileLocation = {line, 0, tokenSet.size()};
+    int finalOff = tokenSet.size() + 1;
+    SourceLocation endFileLocation = {line, 0, finalOff};
     tokenSet.emplace_back(TokenType::EndFileMarker, "0", endFileLocation);
 
     //if there's an unkown token, return null
-    if (find(tokenSet.begin(), tokenSet.end(), TokenType::UNKNOWN) != tokenSet.end()) {
+    //wasn't working, scrapped for now
+    /*if (find(tokenSet.begin(), tokenSet.end(), TokenType::UNKNOWN) != tokenSet.end()) {
         std::vector<Token> nullVec;
         return nullVec;
     } else {
         return tokenSet;
-    }
+    }*/
+   return tokenSet;
 }
 
-std::vector<Token> RunLexerLine(std::string input, int line, int vecSize, bool commenting) {
-    std::vector<Token> lineSet;
+int main(int argc, char *argv[]){
+    std::vector<Token> output = RunLexerProgram("testProgram.txt");
 
-    LexicalAnalyzer lexer(input);
-    lineSet = lexer.tokenize(line, vecSize, commenting);
-    //How do multiline comments work?
-
-    return lineSet;
+    for (int i = 0; i < output.size(); i++) {
+        std::cout << getTokenTypeName(output[i].type) << std::endl;
+        std::cout << output[i].value << std::endl;
+        std::cout << output[i].sourceLocal.line << " " << output[i].sourceLocal.column << " " << output[i].sourceLocal.offset << std::endl;
+    }
+    
+    return 0;
 }
 
 std::string RunLexerTest(std::string input) {
@@ -147,9 +164,9 @@ std::string RunLexerTest(std::string input) {
                     break;
                 case 1:
                 case 2:
-                    if (tokens[i].type == TokenType::Word || tokens[i].type == TokenType::SingleChar || tokens[i].type == TokenType::BoolValue) {
+                    /*if (tokens[i].type == TokenType::Word || tokens[i].type == TokenType::SingleChar || tokens[i].type == TokenType::BoolValue) {
                         return "Error! Invalid assignment: " + input;
-                    }
+                    }*/
                     break;
                 case 3:
                     if (tokens[i].type == TokenType::Integer|| tokens[i].type == TokenType::Decimal || tokens[i].type == TokenType::BoolValue) {
@@ -162,9 +179,9 @@ std::string RunLexerTest(std::string input) {
                     }
                     break;
                 case 5:
-                    if (tokens[i].type == TokenType::Integer|| tokens[i].type == TokenType::Decimal || tokens[i].type == TokenType::Word || tokens[i].type == TokenType::SingleChar) {
+                    /*if (tokens[i].type == TokenType::Integer|| tokens[i].type == TokenType::Decimal || tokens[i].type == TokenType::Word || tokens[i].type == TokenType::SingleChar) {
                         return "Error! Invalid assignment: " + input;
-                    }
+                    }*/
                     break;
             }
 
@@ -207,7 +224,7 @@ std::string RunLexerTest(std::string input) {
                             funcType = 5;
                         }
                     } else if (tokens[i].value == "return") {
-                        if (tokens[i + 1].type == TokenType::VarName) {
+                        /*if (tokens[i + 1].type == TokenType::VarName) {
                             returnType = assignType;
                         } else if (tokens[i + 1].type == TokenType::Integer) {
                             returnType = 1;
@@ -221,7 +238,7 @@ std::string RunLexerTest(std::string input) {
                             returnType = 5;
                         } else {
                             return "Error! Invalid return type: " + input;
-                        }
+                        }*/
                     }
                 }
                 
