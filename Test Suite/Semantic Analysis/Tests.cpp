@@ -16,6 +16,36 @@ ASTNode createASTNode(std::string)
 }
 
 testReturn semanticTests(){
+    Program* r1 = new Program();
+
+    VariableDeclaration* vD1 = new VariableDeclaration();
+    vD1->varType = "number";
+    vD1->identifier = "x";
+
+    LiteralExpression* l1 = new LiteralExpression();
+    l1->value = "5";
+    l1->type = TokenType::Integer;
+
+    vD1->initializer = l1;
+
+    r1->declarations.push_back(vD1);
+
+
+
+    
+
+    VariableDeclaration* vD2 = new VariableDeclaration();
+    vD2->varType = "number";
+    vD2->identifier = "x";
+
+    BinaryExpression* b2 = new BinaryExpression();
+    
+
+    //make a new whatevers next piece of code, whatever statement is starts with, look at header
+    //variable declaration but use a binary expression instead of literal expression
+    //then for x + y use another identifier expression for y
+
+
     ASTNode i1 = createASTNode("Start {variable number x = 5;x = x + y;}");
     ASTNode i2 = createASTNode("Start {if(1 == 1) {variable number x = 5;}print(x);}");
     ASTNode i3 = createASTNode("Start {variable decimal x = 1.5;x = x + 5;}");

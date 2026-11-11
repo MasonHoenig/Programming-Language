@@ -6,7 +6,7 @@
 
 class ASTNode {
 public:
-    SourceLocation location; // Needed for Semantic Analysis errors
+    //SourceLocation location; // Needed for Semantic Analysis errors
     virtual ~ASTNode() = default; // Virtual destructor cleanup
 };
 
