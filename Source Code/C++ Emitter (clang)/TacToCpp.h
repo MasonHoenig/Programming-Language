@@ -69,4 +69,4 @@ std::string arithmeticOperations(const TAC& tac, size_t index);
 
 std::string booleanExpressions(const TAC& tac, size_t index);
 
-std::vector<std::string> emitCpp(const std::vector<std::vector<TAC>>& ir);
+std::ofstream emitCpp(const std::vector<std::vector<TAC>>& ir);

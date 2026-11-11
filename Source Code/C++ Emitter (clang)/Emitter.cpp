@@ -5,14 +5,19 @@
 #include <string>
 #include <vector>
 #include <cctype>
+#include <fstream>
 
 int nextId = 0;
 std::unordered_map<std::string, std::string> names;
 std::unordered_map<std::string, std::string> types;
 
 // Emitter function call in Driver (inputs IR output)
-std::vector<std::string> emitCpp(const std::vector<std::vector<TAC>>& ir) {
-    std::vector<std::string> cppCode;
+std::ofstream emitCpp(const std::vector<std::vector<TAC>>& ir) {
+    std::ofstream outputFile("output.cpp");
+
+    if (!outputFile.is_open()) {
+        throw std::runtime_error("Error: Could not open the file for writing.");
+    }
 
     nextId = 0;
     names.clear();
@@ -25,27 +30,34 @@ std::vector<std::string> emitCpp(const std::vector<std::vector<TAC>>& ir) {
             const TAC& tac = line[i];
 
             if (isArithmetic(tac.operand))
-                cppCode.push_back(arithmeticOperations(tac, i));
+                outputFile << arithmeticOperations(tac, i) << std::endl;
             else if (isBooleanEx(tac.operand))
-                cppCode.push_back(booleanExpressions(tac, i));
+                outputFile << (booleanExpressions(tac, i)) << std::endl;
             else if (isVariableDecl(tac.operand))
-                cppCode.push_back(variableDeclaration(tac));
+                outputFile << (variableDeclaration(tac)) << std::endl;
         }
     }
-    return cppCode;
+    return outputFile;
 }
 
-int main() {
-    std::vector<std::vector<TAC>> testIR = {
-        { { "=", "x", "4" } },
-        { { "=", "y", "5"} },
-        { { "=", "x", "5" } },
-        { { "+", "6", "5" } },
-        { { ">", "x", "y"} },
-        { { "=", "a", "17" } },
-    };
-
-    for (const auto& line : emitCpp(testIR)) {  // IR output is inputted here
-        std::cout << line;
-    }
-}
+//int main() {
+//    std::vector<std::vector<TAC>> testIR = {
+//        { { "=", "x", "4" } },
+//        { { "=", "y", "5"} },
+//        { { "=", "x", "5" } },
+//        { { "+", "6", "5" } },
+//        { { ">", "x", "y"} },
+//        { { "=", "a", "17" } },
+//    };
+//
+//    try {
+//        std::ofstream generatedFile = emitCpp(testIR);      // writes it to ../Source Code/out/build/x64-debug/output.cpp
+//        std::cout << "Code generation completed successfully!" << std::endl;
+//    }
+//    catch (const std::exception& e) {
+//        std::cerr << e.what() << std::endl;
+//        return 1;
+//    }
+//
+//    return 0;
+//}
