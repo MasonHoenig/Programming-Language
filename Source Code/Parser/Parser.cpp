@@ -10,15 +10,15 @@ Parser::Parser(const std::vector<Token>& inputTokens){
 }
 
 bool Parser::isAtEnd(){
-    return currentIndex >= tokens.size();
+    //We are at end if out of bounds, OR if current token is EOF
+    return currentIndex >= tokens.size() || tokens[currentIndex].type == TokenType::EndFileMarker;
 }
 
 Token Parser::peek() {
-    if (isAtEnd()){
-        //Return EOF token 
-        Token eofToken;
-        eofToken.value = "EOF";
-        return eofToken;
+    if (currentIndex >= tokens.size()){
+        // if we go out of bounds, return dummy EOF
+        SourceLocation dummyLoc = {0,0,0};
+        return Token(TokenType::EndFileMarker, "EOF", dummyLoc); // construct dumy EOF
     }
     return tokens[currentIndex];
 }
