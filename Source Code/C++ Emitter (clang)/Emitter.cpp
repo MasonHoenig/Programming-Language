@@ -5,32 +5,59 @@
 #include <string>
 #include <vector>
 #include <cctype>
+#include <fstream>
 
-std::vector<std::string> emitCpp(const std::vector<std::vector<TAC>>& ir) {
-    VariableDeclaration decl;
-    std::vector<std::string> cppCode;
+int nextId = 0;
+std::unordered_map<std::string, std::string> names;
+std::unordered_map<std::string, std::string> types;
 
-    for (const std::vector<TAC>& line : ir) {   // foreach line in IR output
-        for (const TAC& tac : line) {         // foreach TAC on each line
-            cppCode.push_back(decl.variableDeclaration(tac));
+// Emitter function call in Driver (inputs IR output)
+std::ofstream emitCpp(const std::vector<std::vector<TAC>>& ir) {
+    std::ofstream outputFile("output.cpp");
+
+    if (!outputFile.is_open()) {
+        throw std::runtime_error("Error: Could not open the file for writing.");
+    }
+
+    nextId = 0;
+    names.clear();
+    types.clear();
+
+    for (const std::vector<TAC>& line : ir) {
+        clearResultKeys();
+
+        for (size_t i = 0; i < line.size(); ++i) {
+            const TAC& tac = line[i];
+
+            if (isArithmetic(tac.operand))
+                outputFile << arithmeticOperations(tac, i) << std::endl;
+            else if (isBooleanEx(tac.operand))
+                outputFile << (booleanExpressions(tac, i)) << std::endl;
+            else if (isVariableDecl(tac.operand))
+                outputFile << (variableDeclaration(tac)) << std::endl;
         }
     }
-    return cppCode;
+    return outputFile;
 }
 
-int main() {
-	std::string tempText = "Hello World";   // Just for testing; in practice, this will come from the lexer or AST string token. 
-
-    std::vector<std::vector<TAC>> testIR = {
-        { { "=", "x", "5" } },                       // int
-        { { "=", "y", "10.5" } },                    // double
-        { { "=", "z", "true" } },                    // bool
-        { { "=", "s", "\"" + tempText + "\"" } },    // string
-        { { "=", "a", "x" } },                       // a copies x's type (int)
-        { { "=", "x", "6" } },                       // reassign x
-    };
-
-    for (const auto& line : emitCpp(testIR)) {  // IR output is inputted here
-        std::cout << line;
-    }
-}
+//int main() {
+//    std::vector<std::vector<TAC>> testIR = {
+//        { { "=", "x", "4" } },
+//        { { "=", "y", "5"} },
+//        { { "=", "x", "5" } },
+//        { { "+", "6", "5" } },
+//        { { ">", "x", "y"} },
+//        { { "=", "a", "17" } },
+//    };
+//
+//    try {
+//        std::ofstream generatedFile = emitCpp(testIR);      // writes it to ../Source Code/out/build/x64-debug/output.cpp
+//        std::cout << "Code generation completed successfully!" << std::endl;
+//    }
+//    catch (const std::exception& e) {
+//        std::cerr << e.what() << std::endl;
+//        return 1;
+//    }
+//
+//    return 0;
+//}
