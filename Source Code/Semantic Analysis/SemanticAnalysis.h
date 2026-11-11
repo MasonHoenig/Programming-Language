@@ -7,22 +7,25 @@
 
 //Honestly I have not idea what to put here, just ignore this for now I guess
 
-// class SemAnalysis {
-//     private:
-//         //put variables of AST tree and ways of looking at tree
-//         //create a variable table, for holding variables to then send to IR
+class SemAnalysis {
+    private:
+        //put variables of AST tree and ways of looking at tree
+        //create a variable table, for holding variables to then send to IR
+        bool analysis;
+        ASTNode node;
+        std::string fMessage;
+        std::vector<std::string> varScope;
 
-//     public:
-//         //putting tests here:
-//         bool variableDec(VariableDeclaration node){
-//             //don't have to worry if variable is a resticted word, as the lexer will catch it before
-//             //main focus on if variable has already been declared, then putting it into the variable table
-//             //Before that look to see if the value lines up with the type that is declared
-            
+    public:
 
-            
-//             return true;
-//         }
+        void isFalse() {
+            analysis = false;
+            fMessage = "Semantic Analysis Error!";
+        }
 
-//         SemAnalysis(ASTNode node);
-// };
+        bool Analysis(){ return Analysis;}
+
+        std::vector<std::string> scope(){ return varScope;}
+
+        SemAnalysis(Program* node);
+};
