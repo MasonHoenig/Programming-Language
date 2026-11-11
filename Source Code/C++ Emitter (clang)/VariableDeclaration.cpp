@@ -61,46 +61,46 @@ static std::string escapeForCpp(const std::string& s)
 
 // ----------------------------
 
-std::string VariableDeclaration::variableDeclaration(const TAC& instr, const std::string& source) {
+std::string VariableDeclaration::variableDeclaration(const TAC& tac) {
 	std::string valType;
-	std::string rhs = instr.arg2;
+	std::string rhs = tac.arg2;
 
-	if (instr.operand == "=str") {
+	if (tac.operand == "=str") {
 		valType = "std::string";
-		rhs = "\"" + escapeForCpp(instr.arg2) + "\"";
+		rhs = "\"" + escapeForCpp(tac.arg2) + "\"";
 	}
-	else if (instr.operand == "=") {
-		auto src = types.find(instr.arg2);
+	else if (tac.operand == "=") {
+		auto src = types.find(tac.arg2);
 		if (src != types.end()) {
 			valType = src->second;
-			rhs = names[instr.arg2];
+			rhs = names[tac.arg2];
 		}
-		else if (instr.arg2.size() >= 2 && instr.arg2.front() == '"' && instr.arg2.back() == '"') {		//-------------------
+		else if (tac.arg2.size() >= 2 && tac.arg2.front() == '"' && tac.arg2.back() == '"') {		//-------------------
 			valType = "std::string";
-			std::string inner = instr.arg2.substr(1, instr.arg2.size() - 2);							// This checks for string without // "=str"
+			std::string inner = tac.arg2.substr(1, tac.arg2.size() - 2);							// This checks for string without // "=str"
 			rhs = "\"" + escapeForCpp(inner) + "\"";
 		}																								//-------------------
-		else if (isBoolean(instr.arg2)) valType = "bool";
-		else if (isInteger(instr.arg2)) valType = "int";
-		else if (isDouble(instr.arg2))  valType = "double";
-		else return "Error: unknown value '" + instr.arg2 + "'\n";
+		else if (isBoolean(tac.arg2)) valType = "bool";
+		else if (isInteger(tac.arg2)) valType = "int";
+		else if (isDouble(tac.arg2))  valType = "double";
+		else return "Error: unknown value '" + tac.arg2 + "'\n";
 	}
-	else return "Error: Unsupported operation: " + instr.operand + "\n";
+	else return "Error: Unsupported operation: " + tac.operand + "\n";
 
-	auto it = types.find(instr.arg1);
+	auto it = types.find(tac.arg1);
 	if (it == types.end()) {
-		std::string cppName = (instr.operand == "=str")
+		std::string cppName = (tac.operand == "=str")
 			? "t" + std::to_string(nextId++)
-			: instr.arg1;
-		names[instr.arg1] = cppName;
-		types[instr.arg1] = valType;
+			: tac.arg1;
+		names[tac.arg1] = cppName;
+		types[tac.arg1] = valType;
 		return valType + " " + cppName + " = " + rhs + ";\n";
 	}
 
 	const std::string& declared = it->second;
 	bool valid = (declared == valType) || (declared == "double" && valType == "int");
 	if (!valid)
-		return "Error: cannot assign to '" + instr.arg1 + "' (type mismatch)\n";
+		return "Error: cannot assign to '" + tac.arg1 + "' (type mismatch)\n";
 
-	return names[instr.arg1] + " = " + rhs + ";\n";
+	return names[tac.arg1] + " = " + rhs + ";\n";
 }
