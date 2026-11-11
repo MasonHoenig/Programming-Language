@@ -1,3 +1,0 @@
-C:/Users/mhoen/source/repos/Programming-Language/Source Code/out/build/x64-debug/CMakeFiles/emitter_dev.dir
-C:/Users/mhoen/source/repos/Programming-Language/Source Code/out/build/x64-debug/CMakeFiles/edit_cache.dir
-C:/Users/mhoen/source/repos/Programming-Language/Source Code/out/build/x64-debug/CMakeFiles/rebuild_cache.dir
