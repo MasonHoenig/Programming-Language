@@ -6,28 +6,43 @@
 #include <vector>
 #include <cctype>
 
+int nextId = 0;
+std::unordered_map<std::string, std::string> names;
+std::unordered_map<std::string, std::string> types;
+
+// Emitter function call in Driver (inputs IR output)
 std::vector<std::string> emitCpp(const std::vector<std::vector<TAC>>& ir) {
-    VariableDeclaration decl;
     std::vector<std::string> cppCode;
 
-    for (const std::vector<TAC>& line : ir) {   // foreach line in IR output
-        for (const TAC& tac : line) {         // foreach TAC on each line
-            cppCode.push_back(decl.variableDeclaration(tac));
+    nextId = 0;
+    names.clear();
+    types.clear();
+
+    for (const std::vector<TAC>& line : ir) {
+        clearResultKeys();
+
+        for (size_t i = 0; i < line.size(); ++i) {
+            const TAC& tac = line[i];
+
+            if (isArithmetic(tac.operand))
+                cppCode.push_back(arithmeticOperations(tac, i));
+            else if (isBooleanEx(tac.operand))
+                cppCode.push_back(booleanExpressions(tac, i));
+            else if (isVariableDecl(tac.operand))
+                cppCode.push_back(variableDeclaration(tac));
         }
     }
     return cppCode;
 }
 
 int main() {
-	std::string tempText = "Hello World";   // Just for testing; in practice, this will come from the lexer or AST string token. 
-
     std::vector<std::vector<TAC>> testIR = {
-        { { "=", "x", "5" } },                       // int
-        { { "=", "y", "10.5" } },                    // double
-        { { "=", "z", "true" } },                    // bool
-        { { "=", "s", "\"" + tempText + "\"" } },    // string
-        { { "=", "a", "x" } },                       // a copies x's type (int)
-        { { "=", "x", "6" } },                       // reassign x
+        { { "=", "x", "4" } },
+        { { "=", "y", "5"} },
+        { { "=", "x", "5" } },
+        { { "+", "6", "5" } },
+        { { ">", "x", "y"} },
+        { { "=", "a", "17" } },
     };
 
     for (const auto& line : emitCpp(testIR)) {  // IR output is inputted here
