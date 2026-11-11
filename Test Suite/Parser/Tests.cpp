@@ -1,20 +1,37 @@
-// An example test suite file
+#include "../../Source Code/Parser/Parser.h"
+#include "../../Source Code/Lexer/Lexer.h"
 #include "../Run_Tests.h"
+
 // Return the number of tests passed and failed. All error reporting should be handled by adding the error message to the provided vector.
 
 //-----Test 1----- 
-// Source Code = x=1;
+// Source Code = x=5;
 void test1(int &passed, int &failed, std::vector<std::string> &errors){
-    // Call Parser script with above input and compare output with expected output above, update global vars
+    SourceLocation loc = {1, 1, 0};
+
+    std::vector<Token> mockTokens = {
+        Token(TokenType::Keyword, "variable", loc),
+        Token(TokenType::VarType, "number", loc),
+        Token(TokenType::VarName, "x", loc),
+        Token(TokenType::Assign, "=", loc),
+        Token(TokenType::Integer, "5", loc),
+        Token(TokenType::Semicolon, ";", loc),
+        Token(TokenType::EndFileMarker, "EOF", loc)
+    };
+
+    Parser myParser(mockTokens);
+    ASTNode* tree = myParser.Parse();
+
+    std::string actualOutput = myParser.PrintTree(tree);
+
     std::string expectedOutput = R"(Program
 └── VariableDeclaration
     ├── Type: number
     ├── Identifier: x
     └── Initializer: LiteralExpression
-        └── Value: 1)";
-
-    std::string actualOutput = "Placeholder"; // Replace with myParser.PrintTree(tree)
-    std::string error = "Parser Test 1 (Number Declaration) output does not match";
+        └── Value: 5)";
+    
+    std::string error = "Parser Test 1 (Variable Declaration) output does not match";
 
     if (expectedOutput == actualOutput){
         passed += 1;
@@ -22,7 +39,6 @@ void test1(int &passed, int &failed, std::vector<std::string> &errors){
         failed += 1;
         errors.push_back(error);
     }
-
 }
 
 //-----Test 2----- 
