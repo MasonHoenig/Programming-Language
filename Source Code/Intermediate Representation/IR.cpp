@@ -48,17 +48,16 @@
 }*/
 
 
-/*
- * Outputs a vector<vector<TAC>>
- */
-std::vector<std::vector<TAC>> Create_IR(Program program){
+
+//Outputs a vector<vector<TAC>>
+std::vector<std::vector<TAC>> Create_IR(Program* program){
 
     int statementNum = 0; //Increment every time there is a vector<TAC> added to the ouput vector
     int exprNum = 0; //Increment every time there is a TAC added to the inner vector
     std::vector<std::vector<TAC>> output;
     std::vector<TAC> threeAddressCodes; //Contains every Three address code for a statement. Needs to be cleared after each statement.
 
-    for (auto* statement : program.declarations){
+    for (auto* statement : program->declarations){
         //Determine what statement type it is somehow?
         //auto* typedStatement = findStatementType(statement);
         statementNum++;
@@ -67,7 +66,8 @@ std::vector<std::vector<TAC>> Create_IR(Program program){
         {
             // process into a TAC and skip to next loop (continue)
             exprNum++;
-            threeAddressCodes.push_back(handleExpression(varDec->initializer));
+            int startExpr = exprNum;
+            threeAddressCodes.push_back(handleExpression(varDec->initializer,&exprNum).threeAddressCode);
 
             exprNum++;
             threeAddressCodes.push_back(
@@ -75,7 +75,8 @@ std::vector<std::vector<TAC>> Create_IR(Program program){
                     "=",
                     varDec->identifier,
                     //pointerToString(varDec->initializer) // Not correct, needs to point to another address in the threeAdressCodes vector
-                    std::to_string(exprNum-1)
+                    //std::to_string(startExpr)
+                    handleExpression(varDec->initializer,&exprNum).value
                 }
             );
 

@@ -4,6 +4,16 @@
 
 // Put IR-specific classes and structs here.
 
+
+//Struct for handling Expressions, because they are set up really weirdly
+struct ExpressionHandlerOutput
+{
+    TAC threeAddressCode;
+    std::string value = NULL;
+    std::string type = NULL;
+};
+
+
 /*
  * Helper functions:
  * Pointer to string conversion
@@ -27,55 +37,78 @@ std::string pointerToString(T* ptr)
  * probably going to make a handleStatements function too at some point
  */
 
-TAC handleExpression(Expression* expr){
+ExpressionHandlerOutput handleExpression(Expression* expr,int* exprCounter){
 
-    TAC output;
+    ExpressionHandlerOutput output;
     //Dynamic cast block part 2: electric boogaloo
+
     LiteralExpression* litExp = dynamic_cast<LiteralExpression *>(expr);
     if (litExp)
     {
-        //Process the expression into TAC
-            output = 
-            {
-                "Operand",
-                "val1",
-                "val2"
-            };
+        exprCounter++;
+
+        output.value = litExp->value;
+        //output.type = litExp->type;
+
         return output;
     }
     IdentifierExpression *idExp = dynamic_cast<IdentifierExpression *>(expr);
     if (idExp)
     {
-        // Process the expression into TAC
+        exprCounter++;
+        // Somehow needs to reference the result of a different calulation. Update: Function now has the runing exprCounter variable for this.
 
         return output;
     }
     BinaryExpression *binExp = dynamic_cast<BinaryExpression *>(expr);
     if (binExp)
     {
-        // Process the expression into TAC
-
+        exprCounter++;
+        // recursively call to the left and right of the operand
+        output =
+        {
+            "",//An empty string, because TokenType was used incorrectly to define the operator, otherwise it would be this: binExp->op
+            handleExpression(binExp->left,exprCounter).value,
+            handleExpression(binExp->right,exprCounter).value
+        };
         return output;
     }
     UnaryExpression *unExp = dynamic_cast<UnaryExpression *>(expr);
     if (unExp)
     {
-        // Process the expression into TAC
-
+        exprCounter++;
+        // TAC = {op,val1,NULL}
+        output =
+        {
+            "",//Once again an empty string, because TokenType was used incorrectly to define the operator, otherwise it would be this: unExp->op
+            handleExpression(unExp->right,exprCounter).value
+            //The third value stays NULL
+        };
         return output;
     }
     FunctionCallExpression *funCallExp = dynamic_cast<FunctionCallExpression *>(expr);
     if (funCallExp)
     {
+        exprCounter++;
         // Process the expression into TAC
-
+        output =
+        {
+            "",
+            "",
+        };
         return output;
     }
     ArrayAccessExpression *arrAccExp = dynamic_cast<ArrayAccessExpression *>(expr);
     if (arrAccExp)
     {
+        exprCounter++;
         // Process the expression into TAC
+        output =
+        {
+            "",
+            "",
 
+        };
         return output;
     }
     std::cerr << "Error: Unrecognised Expression given to handleExpression" << std::endl;
