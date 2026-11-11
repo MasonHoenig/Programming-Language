@@ -1,0 +1,7 @@
+variable number x = 5;
+variable decimal y = 2.3;
+variable bool z = true;
+variable word a = "test";
+variable word b = "Fates is the best Fire Emblem!";
+variable word c = "14";
+variable word d = "if";
