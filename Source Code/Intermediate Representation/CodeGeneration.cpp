@@ -18,19 +18,19 @@ std::string mapType(const std::string& type) {
 
 // Takes Expression* and figures out what concrete type it is
 std::string generateExpression(const Expression* expr) {
-    if (auto* num = dynamic_cast<const NumberLiteral*>(expr))
-        return num->value;
+    if (LiteralExpression* literal = dynamic_cast<const LiteralExpression*>(expr))
+        return literal->value;
 
-    if (auto* str = dynamic_cast<const StringLiteral*>(expr))
-        return "\"" + str->value + "\"";
+    if (IdentifierExpression* identifier = dynamic_cast<const IdentifierExpression*>(expr))
+        return identifier->name;
 
-    if (auto* id = dynamic_cast<const Identifier*>(expr))
-        return id->name;
-
-    if (auto* binaryExpr = dynamic_cast<const BinaryExpression*>(expr)) {
+    if (BinaryExpression* binaryExpr = dynamic_cast<const BinaryExpression*>(expr)) {
         return "(" + generateExpression(binaryExpr->left) + " " + binaryExpr->op + " "  // recursivly calls generateExpression; handles cases like 'x + (y * 2)'
             + generateExpression(binaryExpr->right) + ")";
     }
+
+    // add expressions as we go (unary, functional, array, etc.)
+    
     throw std::runtime_error("Unknown expression type");
 }
 

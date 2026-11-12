@@ -9,8 +9,8 @@ const std::unordered_map<std::string, std::string> typeMap = {
     { "number", "int" },
     { "decimal", "double"},
     { "word", "std::string" },
-    // bool translates directly
+    { "bool", "bool" },
 };
 
-std::string mapType(const std::string type);
+std::string mapType(const std::string& type);
 std::string variableDeclaration(const std::string& varType, const std::string& identifier, const Expression* initializer);
