@@ -41,6 +41,8 @@ struct Token {
     Token(TokenType t, const std::string& v, SourceLocation sl):type(t),value(v),sourceLocal(sl) {}
 };
 
+std::vector<Token> RunLexerProgram(const std::string& filePath);
+
 class LexicalAnalyzer {
 private:
 	std::string input;
@@ -57,6 +59,7 @@ private:
         keywords["else"] = TokenType::Keyword;
         keywords["while"] = TokenType::Keyword;
         keywords["for"] = TokenType::Keyword;
+        keywords["break"] = TokenType::Keyword;
         keywords["print"] = TokenType::Keyword;
         keywords["Node"] = TokenType::Keyword;
         keywords["OptionSet"] = TokenType::Keyword;
