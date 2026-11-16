@@ -153,10 +153,15 @@ private:
         return false;
     }
 
-    /*Token rewriteToVarName(Token var) {
-        
-        return var;
-    }*/
+    bool IsExistingVar2(std::vector<std::string> vars, std::string name) {
+        for (int i = 0; i < vars.size(); i++) {
+            if (vars[i] == name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
     
 public:
     LexicalAnalyzer(const std::string& source):input(source),position(0) {
@@ -164,7 +169,7 @@ public:
         initVarTypes();
     }
 
-	std::vector<Token> tokenize(int line, int vecSize, bool commenting) {
+	std::vector<Token> tokenize(int line, int vecSize, bool commenting, std::vector<std::string> vars) {
         std::vector<Token> tokens;
         bool isEquation = false;
         bool quoting = false;
@@ -252,7 +257,7 @@ public:
                     }
                     tokens.emplace_back(TokenType::Word, word, newSL);*/
                 } else {
-                    if (IsExistingVar(tokens, word)) {
+                    if (IsExistingVar(tokens, word) || IsExistingVar2(vars, word)) {
                         tokens.emplace_back(TokenType::VarName, word, newSL);
                     } else {
                         tokens.emplace_back(TokenType::UNKNOWN, word, newSL);

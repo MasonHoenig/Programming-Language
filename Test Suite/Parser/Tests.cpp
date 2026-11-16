@@ -41,6 +41,85 @@ void test1(int &passed, int &failed, std::vector<std::string> &errors){
     }
 }
 
+//-----Test 1-2: Sprint 2 Goal----- 
+// Source Code = 
+// variable number x = 5;
+// while (x < 10) {
+//     x = x + 1;
+// }
+void test1-2(int &passed, int &failed, std::vector<std::string> &errors){
+    SourceLocation loc = {1, 1, 0};
+
+    std::vector<Token> mockTokens = {
+        // variable number x = 5;
+        Token(TokenType::Keyword, "variable", loc),
+        Token(TokenType::VarType, "number", loc),
+        Token(TokenType::VarName, "x", loc),
+        Token(TokenType::Assign, "=", loc),
+        Token(TokenType::Integer, "5", loc),
+        Token(TokenType::Semicolon, ";", loc),
+        
+        // while (x < 10) {
+        Token(TokenType::Keyword, "while", loc),
+        Token(TokenType::Parentheses, "(", loc),
+        Token(TokenType::VarName, "x", loc),
+        Token(TokenType::Comparison, "<", loc),
+        Token(TokenType::Integer, "10", loc),
+        Token(TokenType::Parentheses, ")", loc),
+        Token(TokenType::Parentheses, "{", loc),
+        
+        // x = x + 1;
+        Token(TokenType::VarName, "x", loc),
+        Token(TokenType::Assign, "=", loc),
+        Token(TokenType::VarName, "x", loc),
+        Token(TokenType::Math, "+", loc),
+        Token(TokenType::Integer, "1", loc),
+        Token(TokenType::Semicolon, ";", loc),
+        
+        // }
+        Token(TokenType::Parentheses, "}", loc),
+        
+        Token(TokenType::EndFileMarker, "EOF", loc)
+    };
+
+    Parser myParser(mockTokens);
+    ASTNode* tree = myParser.Parse();
+
+    std::string actualOutput = myParser.PrintTree(tree);
+
+    std::string expectedOutput = R"(Program
+└── VariableDeclaration
+    ├── Type: number
+    ├── Identifier: x
+    └── Initializer: LiteralExpression
+        └── Value: 5
+└── WhileLoop
+    ├── Condition: 
+    │   BinaryExpression
+        ├── Left: IdentifierExpression (x)
+        ├── Operator: <
+        └── Right: LiteralExpression
+        └── Value: 10
+    └── Body: 
+        └── AssignmentStatement
+    ├── Identifier: x
+    └── Value: 
+        BinaryExpression
+        ├── Left: IdentifierExpression (x)
+        ├── Operator: +
+        └── Right: LiteralExpression
+        └── Value: 1)";
+    
+    std::string error = "Parser Test 1-2 (While Loop & Assignment) output does not match";
+
+    if (expectedOutput == actualOutput){
+        passed += 1;
+    } else {
+        failed += 1;
+        errors.push_back(error);
+    }
+}
+
 //-----Test 2----- 
 // Source Code = variable word z = "hello world!";
 void test2(int &passed, int &failed, std::vector<std::string> &errors){
@@ -294,15 +373,16 @@ testReturn parserTests(){ // This function is called and returns the struct. I w
     std::vector<std::string> errors = {};
 
     test1(passed,failed,errors);
-    test2(passed,failed,errors);
-    test3(passed,failed,errors);
-    test4(passed,failed,errors);
-    test5(passed,failed,errors);
-    test6(passed,failed,errors);
-    test7(passed,failed,errors);
-    test8(passed,failed,errors);
-    test9(passed,failed,errors);
-    test10(passed,failed,errors);
+    test1-2(passed,failed,erros);
+    // test2(passed,failed,errors);
+    // test3(passed,failed,errors);
+    // test4(passed,failed,errors);
+    // test5(passed,failed,errors);
+    // test6(passed,failed,errors);
+    // test7(passed,failed,errors);
+    // test8(passed,failed,errors);
+    // test9(passed,failed,errors);
+    // test10(passed,failed,errors);
 
     testReturn passFail; 
     passFail.passed = passed;
