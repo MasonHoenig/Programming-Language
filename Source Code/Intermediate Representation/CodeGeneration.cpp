@@ -49,8 +49,9 @@ std::string variableDeclaration(const std::string& varType, const std::string& i
     return output + ";\n";
 }
 
-std::string GenerateCode(const Program* program, const std::string& outputPath) {
+std::string GenerateCode(const Program* program) {
 
+    std::string outputPath = "./CodeGeneration.cpp";
     std::ofstream outputFile(outputPath);
     // outputFile << "Line to write goes here"; (Example for writing to a fstream operand.)
     if (!outputFile.is_open()) {
