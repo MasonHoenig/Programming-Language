@@ -104,17 +104,17 @@ std::vector<Token> RunLexerProgram(const std::string& filePath) {
    return tokenSet;
 }
 
-int main(int argc, char *argv[]){
-    std::vector<Token> output = RunLexerProgram("testProgram.txt");
-
-    for (int i = 0; i < output.size(); i++) {
-        std::cout << getTokenTypeName(output[i].type) << std::endl;
-        std::cout << output[i].value << std::endl;
-        std::cout << output[i].sourceLocal.line << " " << output[i].sourceLocal.column << " " << output[i].sourceLocal.offset << std::endl;
-    }
-    
-    return 0;
-}
+//int main(int argc, char *argv[]){
+//    std::vector<Token> output = RunLexerProgram("testProgram.txt");
+//
+//    for (int i = 0; i < output.size(); i++) {
+//        std::cout << getTokenTypeName(output[i].type) << std::endl;
+//        std::cout << output[i].value << std::endl;
+//        std::cout << output[i].sourceLocal.line << " " << output[i].sourceLocal.column << " " << output[i].sourceLocal.offset << std::endl;
+//    }
+//    
+//    return 0;
+//}
 
 std::string RunLexerTest(std::string input) {
 	std::string output = "";

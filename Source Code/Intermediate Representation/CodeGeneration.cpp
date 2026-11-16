@@ -13,7 +13,7 @@
 std::string mapType(const std::string& type) {
     auto it = typeMap.find(type);
     if (it == typeMap.end()) //Something is up with this logic, should probably be looked at.
-        throw std::runtime_error("Unknown type: " + type);
+        exit(EXIT_FAILURE);
     return it->second;
 }
 
@@ -33,39 +33,37 @@ std::string generateExpression(const Expression* expr) {
 
     // add expressions as we go (unary, functional, array, etc.)
     
-    throw std::runtime_error("Unknown expression type");
+    exit(EXIT_FAILURE);
 }
 
 std::string variableDeclaration(const std::string& varType, const std::string& identifier, const Expression* initializer) {
     std::string output = mapType(varType) + " " + identifier;
-    if (initializer)
+    if (initializer) {
         output += " = " + generateExpression(initializer);
+    }
+    else {
+        std::cerr << "Fatal Error: VariableDeclaration Statement contains no initializer";
+        exit(EXIT_FAILURE);
+    }
+
     return output + ";\n";
 }
 
-std::string GenerateCode(const Program* program){
+std::string GenerateCode(const Program* program, const std::string& outputPath) {
 
-    std::ofstream outputFile("GeneratedCode.cpp");
+    std::ofstream outputFile(outputPath);
     // outputFile << "Line to write goes here"; (Example for writing to a fstream operand.)
-    if(!outputFile.is_open()){
-        std::cerr << "Error: Unable to open/create file";
+    if (!outputFile.is_open()) {
+        std::cerr << ""Unable to open output file : " + outputPath";
         exit(EXIT_FAILURE);
     }
 
     for(auto* statement : program->declarations){
 
-        const VariableDeclaration *varDec = dynamic_cast<const VariableDeclaration *>(statement);
+        const VariableDeclaration *varDec = dynamic_cast<const VariableDeclaration*>(statement);
         if (varDec)
         { 
-            outputFile << mapType(varDec->varType) + " " + varDec->identifier;
-            if(varDec->initializer){ //Should always be true
-                outputFile << " = ";
-                outputFile << generateExpression(varDec->initializer);
-                outputFile << ";" << std::endl;
-            }else{
-                std::cerr << "Fatal Error: VariableDeclaration Statement contains no initializer";
-                exit(EXIT_FAILURE);
-            }
+            variableDeclaration(varDec->varType, varDec->identifier, varDec->initializer)
             continue;
         }
         const IfStatement *ifState = dynamic_cast<const IfStatement *>(statement);
@@ -116,4 +114,6 @@ std::string GenerateCode(const Program* program){
         std::cerr << "Error: Unrecognised Statement type";
         exit(EXIT_FAILURE);
     }
+
+    return outputPath;
 }
