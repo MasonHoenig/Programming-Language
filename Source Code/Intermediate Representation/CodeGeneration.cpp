@@ -30,90 +30,105 @@ std::string generateExpression(const Expression* expr) {
         return "(" + generateExpression(binaryExpr->left) + " " + binaryExpr->op + " "  // recursively calls generateExpression; handles cases like 'x + (y * 2)'
             + generateExpression(binaryExpr->right) + ")";
     }
+    if (const UnaryExpression* unaryExpr = dynamic_cast<const UnaryExpression*>(expr)) {
+        return unaryExpr->op + "(" + generateExpression(unaryExpr->right) + ")";
+    }
+    if (const FunctionCallExpression *funcExpr = dynamic_cast<const FunctionCallExpression *>(expr)){
+        //Placeholder
+    }
+    if (const ArrayAccessExpression *arrExpr = dynamic_cast<const ArrayAccessExpression *>(expr))
+    {
+        //Placeholder
+    }
 
-    // add expressions as we go (unary, functional, array, etc.)
-    
+    std::cerr << "Error: Unimplemented Expression type called";
     exit(EXIT_FAILURE);
 }
 
-std::string variableDeclaration(const std::string& varType, const std::string& identifier, const Expression* initializer) {
-    std::string output = mapType(varType) + " " + identifier;
-    if (initializer) {
-        output += " = " + generateExpression(initializer);
+
+void handleStatement(Statement* statement, std::ofstream* output){
+
+    bool validPolyClass = false; //Set this to true at the beginning of all the statement handling
+
+    
+    if (const VariableDeclaration *varDec = dynamic_cast<const VariableDeclaration *>(statement))
+    {
+        validPolyClass = true;
+
+        std::string strOutput = mapType(varDec->varType) + " " + varDec->identifier;
+        if (varDec->initializer)
+        {
+            strOutput += " = " + generateExpression(varDec->initializer);
+        }
+        else
+        {
+            std::cerr << "Fatal Error: VariableDeclaration Statement contains no initializer";
+            exit(EXIT_FAILURE);
+        }
+
+        *output << strOutput << ";\n";
     }
-    else {
-        std::cerr << "Fatal Error: VariableDeclaration Statement contains no initializer";
+    
+    if (const IfStatement *ifState = dynamic_cast<const IfStatement *>(statement))
+    {
+        validPolyClass = true;
+
+        std::cerr << "Error: Function not yet implemented";
         exit(EXIT_FAILURE);
     }
+    
+    if (const WhileLoop *whiLoop = dynamic_cast<const WhileLoop *>(statement))
+    {
+        validPolyClass = true;
 
-    return output + ";\n";
+        std::cerr << "Error: Function not yet implemented";
+        exit(EXIT_FAILURE);
+    }
+    
+    if (const ArrayDeclaration *arrDec = dynamic_cast<const ArrayDeclaration *>(statement))
+    {
+        validPolyClass = true;
+
+        std::cerr << "Error: Function not yet implemented";
+        exit(EXIT_FAILURE);
+
+    }
+    
+    if (const FunctionDeclaration *funDec = dynamic_cast<const FunctionDeclaration *>(statement))
+    {
+        validPolyClass = true;
+
+        std::cerr << "Error: Function not yet implemented";
+        exit(EXIT_FAILURE);
+
+    }
+    
+    if (const ForLoop *forLp = dynamic_cast<const ForLoop *>(statement))
+    {
+        validPolyClass = true;
+
+        std::cerr << "Error: Function not yet implemented";
+        exit(EXIT_FAILURE);
+
+    }
+    if(!validPolyClass){
+        std::cerr << "Error: Unrecognised Statement type";
+        exit(EXIT_FAILURE);
+    }
 }
 
 std::string GenerateCode(const Program* program) {
 
-    std::string outputPath = "./CodeGeneration.cpp";
+    std::string outputPath = "./GeneratedCode.cpp";
     std::ofstream outputFile(outputPath);
-    // outputFile << "Line to write goes here"; (Example for writing to a fstream operand.)
+
     if (!outputFile.is_open()) {
         std::cerr << "Unable to open output file : " + outputPath;
         exit(EXIT_FAILURE);
     }
 
     for(auto* statement : program->declarations){
-
-        const VariableDeclaration *varDec = dynamic_cast<const VariableDeclaration*>(statement);
-        if (varDec)
-        { 
-            variableDeclaration(varDec->varType, varDec->identifier, varDec->initializer);
-            continue;
-        }
-        const IfStatement *ifState = dynamic_cast<const IfStatement *>(statement);
-        if (ifState)
-        {
-            std::cerr << "Error: Function not yet implemented";
-            exit(EXIT_FAILURE);
-
-            //Uncomment the next line when finished writing this part of the function so the default case works properly.
-            //continue;
-        }
-        const WhileLoop *whiLoop = dynamic_cast<const WhileLoop *>(statement);
-        if (whiLoop)
-        {
-            std::cerr << "Error: Function not yet implemented";
-            exit(EXIT_FAILURE);
-
-            //Uncomment the next line when finished writing this part of the function so the default case works properly.
-            //continue;
-        }
-        const ArrayDeclaration *arrDec = dynamic_cast<const ArrayDeclaration *>(statement);
-        if (arrDec)
-        {
-            std::cerr << "Error: Function not yet implemented";
-            exit(EXIT_FAILURE);
-
-            //Uncomment the next line when finished writing this part of the function so the default case works properly.
-            //continue;
-        }
-        const FunctionDeclaration *funDec = dynamic_cast<const FunctionDeclaration *>(statement);
-        if (funDec)
-        {  
-            std::cerr << "Error: Function not yet implemented";
-            exit(EXIT_FAILURE);
-
-            //Uncomment the next line when finished writing this part of the function so the default case works properly.
-            //continue;
-        }
-        const ForLoop *forLp = dynamic_cast<const ForLoop *>(statement);
-        if (forLp)
-        {
-            std::cerr << "Error: Function not yet implemented";
-            exit(EXIT_FAILURE);
-
-            //Uncomment the next line when finished writing this part of the function so the default case works properly.
-            //continue;
-        }
-        std::cerr << "Error: Unrecognised Statement type";
-        exit(EXIT_FAILURE);
+        handleStatement(statement,&outputFile);
     }
 
     return outputPath;

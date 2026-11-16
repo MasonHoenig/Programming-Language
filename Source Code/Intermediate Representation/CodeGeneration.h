@@ -7,7 +7,7 @@
 
 // Create a symbol table unordered_map (source code variables (number, word, node) to cpp code variables (int, string, double)
 
-const std::unordered_map<std::string, std::string> typeMap = {
+const std::unordered_map<std::string, std::string> typeMap = { //We should add boolean handling to the map soon
     { "number", "int" },
     { "decimal", "double"},
     { "word", "std::string" },
