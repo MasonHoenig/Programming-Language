@@ -54,7 +54,7 @@ std::string GenerateCode(const Program* program, const std::string& outputPath) 
     std::ofstream outputFile(outputPath);
     // outputFile << "Line to write goes here"; (Example for writing to a fstream operand.)
     if (!outputFile.is_open()) {
-        std::cerr << ""Unable to open output file : " + outputPath";
+        std::cerr << "Unable to open output file : " + outputPath;
         exit(EXIT_FAILURE);
     }
 
@@ -63,7 +63,7 @@ std::string GenerateCode(const Program* program, const std::string& outputPath) 
         const VariableDeclaration *varDec = dynamic_cast<const VariableDeclaration*>(statement);
         if (varDec)
         { 
-            variableDeclaration(varDec->varType, varDec->identifier, varDec->initializer)
+            variableDeclaration(varDec->varType, varDec->identifier, varDec->initializer);
             continue;
         }
         const IfStatement *ifState = dynamic_cast<const IfStatement *>(statement);
