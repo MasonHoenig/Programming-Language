@@ -7,4 +7,4 @@
 #include "../Intermediate Representation/CodeGeneration.h"
 #include "../Parser/AST.h"
 
-void RunCompiler(const std::string& inputPath, const std::string& outputPath);
+void RunCompiler(const std::string& inputPath);
