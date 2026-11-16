@@ -47,12 +47,11 @@ std::string getTokenTypeName(TokenType type)
     }
 }
 
-std::vector<Token> RunLexerLine(std::string input, int line, int vecSize, bool commenting) {
+std::vector<Token> RunLexerLine(std::string input, int line, int vecSize, bool commenting, std::vector<std::string> vars) {
     std::vector<Token> lineSet;
 
     LexicalAnalyzer lexer(input);
-    lineSet = lexer.tokenize(line, vecSize, commenting);
-    //How do multiline comments work?
+    lineSet = lexer.tokenize(line, vecSize, commenting, vars);
 
     return lineSet;
 }
@@ -62,13 +61,14 @@ std::vector<Token> RunLexerProgram(const std::string& filePath) {
     std::vector<Token> tokenSet;
     int line = 1;
     std::string programLine;
+    std::vector<std::string> vars;
     std::ifstream file(filePath);
     bool commenting = false;
 
     if (file.is_open()) {
         while (getline (file, programLine)) {
-            std::vector<Token> newLine = RunLexerLine(programLine, line, tokenSet.size(), commenting);
-            if (newLine.back().type == TokenType::UnclosedComment) {
+            std::vector<Token> newLine = RunLexerLine(programLine, line, tokenSet.size(), commenting, vars);
+            if (newLine.size() > 0 && newLine.back().type == TokenType::UnclosedComment) {
                 commenting = true;
                 newLine.pop_back();
             } else {
@@ -76,6 +76,9 @@ std::vector<Token> RunLexerProgram(const std::string& filePath) {
             }
 
             for (int i = 0; i < newLine.size(); i++) {
+                if (newLine[i].type == TokenType::VarName) {
+                    vars.push_back(newLine[i].value);
+                }
                 tokenSet.push_back(newLine[i]);
             }
 
@@ -120,7 +123,8 @@ std::string RunLexerTest(std::string input) {
 	std::string output = "";
 
 	LexicalAnalyzer lexer(input);
-	std::vector<Token> tokens = lexer.tokenize(0, 0, false); //return the vector of tokens to the parser
+    std::vector<std::string> foo;
+	std::vector<Token> tokens = lexer.tokenize(0, 0, false, foo); //return the vector of tokens to the parser
 
     if (tokens.empty()) {
         return output;

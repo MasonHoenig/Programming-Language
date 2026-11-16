@@ -16,4 +16,4 @@ const std::unordered_map<std::string, std::string> typeMap = { //We should add b
 
 std::string mapType(const std::string& type);
 std::string variableDeclaration(const std::string& varType, const std::string& identifier, const Expression* initializer);
-std::string GenerateCode(const Program* program, const std::string& outputPath);
+std::string GenerateCode(const Program* program);
