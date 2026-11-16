@@ -16,6 +16,7 @@ ASTNode createASTNode(std::string)
 }
 
 testReturn semanticTests(){
+    //test case 1
     Program* r1 = new Program();
 
     VariableDeclaration* vD1 = new VariableDeclaration();
@@ -31,14 +32,42 @@ testReturn semanticTests(){
     r1->declarations.push_back(vD1);
 
     
-
-    
+    //test case 2
+    Program* r2 = new Program();
 
     VariableDeclaration* vD2 = new VariableDeclaration();
     vD2->varType = "number";
     vD2->identifier = "x";
 
-    BinaryExpression* b2 = new BinaryExpression();
+    LiteralExpression* l2 = new LiteralExpression();
+    l2->value = "5";
+    l2->type = TokenType::Integer;
+
+    vD2->initializer = l2;
+
+    r2->declarations.push_back(vD2);
+
+    VariableDeclaration* vD22 = new VariableDeclaration();
+    vD22->varType = "number";
+    vD22->identifier = "x";
+
+    LiteralExpression* l22 = new LiteralExpression();
+    l22->value = "20";
+    l22->type = TokenType::Integer;
+
+    vD2->initializer = l22;
+
+
+    r2->declarations.push_back(vD22);
+
+    //test case 3
+    //put test case here
+
+    // VariableDeclaration* vD2 = new VariableDeclaration();
+    // vD2->varType = "number";
+    // vD2->identifier = "x";
+
+    // BinaryExpression* b2 = new BinaryExpression();
     
 
     //make a new whatevers next piece of code, whatever statement is starts with, look at header
@@ -56,12 +85,12 @@ testReturn semanticTests(){
     // std::string o2 = runSemTest(i2);
     // std::string o3 = runSemTest(i3);
     // std::string o4 = runSemTest(i4);
-    // std::string o5 = runSemTest(i5);
+    // std::string o5 = "true";
 
-    bool o1 = runSemTests(r1);
+    std::string o1 = (runSemTests(r1) ? "True" : "False");
 
-    bool co1 = true;
-    std::string co2 = "";
+    std::string co1 = "True";
+    std::string co2 = "False";
     std::string co3 = "";
     std::string co4 = "";
     std::string co5 = "";
@@ -75,7 +104,7 @@ testReturn semanticTests(){
     }
     else{
         passFail.failed++;
-        passFail.errorMessages.push_back("Test 1 failed, got: " + o1 + "\n");
+        passFail.errorMessages.push_back("Test 1 failed, got: " + o1 + "Expected Output: " + co1 + "\n");
     }
 
     // if(o2 == co2){   
@@ -106,7 +135,7 @@ testReturn semanticTests(){
     // }
     // else{
     //     passFail.failed++;
-    //     passFail.errorMessages.push_back("Test 1 failed: Expected " + co4 + " but got " + o4 + "\n");
+    //     passFail.errorMessages.push_back("Test 1 failed: Expected " + co5 + " but got " + o5 + "\n");
     // }
 
     passFail.errorMessages.push_back(""); //Add an empty string to the error vector.
