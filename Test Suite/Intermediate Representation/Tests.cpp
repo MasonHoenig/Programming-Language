@@ -1,48 +1,135 @@
-// An example test suite file
+//The test suite file for the IR/Code Generation
 #include "../Run_Tests.h"
-#include "../../Source Code/Intermediate Representation/IR.cpp"
+#include "../../Source Code/Intermediate Representation/CodeGeneration.cpp"
+
+//Make a dedicated function to test each AST Polymorphic class type first and foremost.
+
+//Statement Tests
+void testVariableDeclaration(Program *program, std::vector<std::string> *errors,testReturn* passFail)
+{
+    //Initialize the declarations vector state to represent the test state.
+    VariableDeclaration *varDecl = new VariableDeclaration();
+    varDecl->varType = "number";
+    varDecl->identifier = "x";
+
+    LiteralExpression *literal1 = new LiteralExpression();
+    literal1->value = "5";
+    literal1->type = TokenType::Integer;
+
+    varDecl->initializer = literal1;
+
+    program->declarations.push_back(varDecl);
+
+    //Set up the expected output string:
+    std::string expectedOutput = "int x = 5;";
+
+    //Call the function(s) from the real code.
+    std::string realOutput = GenerateCode(program);
+
+    //Compare output.
+    if (expectedOutput == realOutput)
+    {
+        passFail->passed++;
+    }else{
+        passFail->failed++;
+        passFail->errorMessages.push_back("Error when testing VariableDeclaration. Expected: " + expectedOutput + " Got: " + realOutput + "\n");
+    }
+
+    //Clean up declarations vector for the next function to use.
+    program->declarations.clear();
+}
+void testIfStatement(Program *program, std::vector<std::string> *errors, testReturn *passFail)
+{
+    // Unimplemented, do not call
+    std::cerr << "Unimplemented tests should not be called.";
+    exit(EXIT_FAILURE);
+}
+void testWhileLoop(Program *program, std::vector<std::string> *errors, testReturn *passFail)
+{
+    // Unimplemented, do not call
+    std::cerr << "Unimplemented tests should not be called.";
+    exit(EXIT_FAILURE);
+}
+void testArrayDeclaration(Program *program, std::vector<std::string> *errors, testReturn *passFail)
+{
+    // Unimplemented, do not call
+    std::cerr << "Unimplemented tests should not be called.";
+    exit(EXIT_FAILURE);
+}
+void testFunctionDeclaration(Program *program, std::vector<std::string> *errors, testReturn *passFail)
+{
+    // Unimplemented, do not call
+    std::cerr << "Unimplemented tests should not be called.";
+    exit(EXIT_FAILURE);
+}
+void testForLoop(Program *program, std::vector<std::string> *errors, testReturn *passFail)
+{
+    // Unimplemented, do not call
+    std::cerr << "Unimplemented tests should not be called.";
+    exit(EXIT_FAILURE);
+}
+
+//Expression Tests
+
+void testLiteralExpression(Program *program, std::vector<std::string> *errors, testReturn *passFail)
+{
+    // Unimplemented, do not call
+    std::cerr << "Unimplemented tests should not be called.";
+    exit(EXIT_FAILURE);
+}
+void testIdentifierExpression(Program *program, std::vector<std::string> *errors, testReturn *passFail)
+{
+    // Unimplemented, do not call
+    std::cerr << "Unimplemented tests should not be called.";
+    exit(EXIT_FAILURE);
+}
+void testBinaryExpression(Program *program, std::vector<std::string> *errors, testReturn *passFail)
+{
+    // Unimplemented, do not call
+    std::cerr << "Unimplemented tests should not be called.";
+    exit(EXIT_FAILURE);
+}
+void testUnaryExpression(Program *program, std::vector<std::string> *errors, testReturn *passFail)
+{
+    // Unimplemented, do not call
+    std::cerr << "Unimplemented tests should not be called.";
+    exit(EXIT_FAILURE);
+}
+void testFunctionCallExpression(Program *program, std::vector<std::string> *errors, testReturn *passFail)
+{
+    // Unimplemented, do not call
+    std::cerr << "Unimplemented tests should not be called.";
+    exit(EXIT_FAILURE);
+}
+void testArrayAccessExpression(Program *program, std::vector<std::string> *errors, testReturn *passFail)
+{
+    // Unimplemented, do not call
+    std::cerr << "Unimplemented tests should not be called.";
+    exit(EXIT_FAILURE);
+}
 
 /*
 * So, This will take some form of AST (Abstract Syntax Tree) and output C++ Code that can be passed to Clang.
-* The IR usually outputs Assembly code, but we don't know enough assembly,so we are outputting to a Three address code for the Emitter to make into C++
-* Takes AST as input and then "flattens" it. This "flat" AST might(?) be a Three Address Code
-* A TAC list might look like ([*,a,b],[uminus,b,t1],[jump,L1,NULL])
-* Jumps in TAC
-* Unconditional jump: jump,dest,NULL
-* Conditional jump: jump,dest,Pointer_to_conditional_TAC
 */
 // Return the number of tests passed and failed. All error reporting should be handled by adding the error message to the provided vector.
 testReturn irTests(){
     testReturn passFail; //Initialize the passFail struct
     passFail.passed = 0;
     passFail.failed = 0;
-    //passFail.errorMessages.push_back(""); //Add an empty string to the error vector.
     
-    std::vector<Program> testInputs = 
-    {
-        "testInput1",
-        "testInput2"
-    };
-    std::vector<TAC> expectedOutputs = 
-    {
-        "testOutput1",
-        "testOutput2"
-    };
-    std::vector<std::string> errorMessages = 
-    {
-        "testErr1",
-        "testErr2"
-    };
-    std::vector<TAC> realOutputs; //This is what stores the actual outputs from the functions running
-
-    //Actual function execution goes here, unfortunately there is no way to make it flexible.
-
+   //std::vector<std::string> errorMessages;
+    Program* testInput = new Program();
+    // Actual function execution goes here.
+    testVariableDeclaration(testInput,&passFail.errorMessages,&passFail);
+    
     //End function execution
 
-    //The number of test inputs and outputs are hardcoded, so its feasable(though bad practice) to hardcode the number of loops
-    for (int i = 0; i < testInputs.size() || i < expectedOutputs.size(); i++){
-        
-    }
+    /*for (int i = 0; i < testInputs.size() || i < expectedOutputs.size(); i++){
 
+        if(expectedOutputs[i] == realOutputs[i]){
+            passFail.passed++;
+        }else{passFail.failed++;}
+    }*/
+    
     return passFail;
 }

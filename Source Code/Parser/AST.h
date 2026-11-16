@@ -38,13 +38,13 @@ public:
 class BinaryExpression : public Expression {
 public:
     Expression* left; // Left side of operation
-    TokenType op; // The operator Ex: +, -, =, <, ect
+    std::string op; // The operator Ex: +, -, =, <, ect
     Expression* right; // The right side of the operation
 };
 
 class UnaryExpression : public Expression {
 public:
-    TokenType op; // The operator Ex: not, -
+    std::string op; // The operator Ex: not, -
     Expression* right; // The expression being operated on
 };
 

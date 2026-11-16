@@ -1,5 +1,5 @@
 // The code for including and running the test suites goes here.
-// This file HOPEFULLY shouldn't need to be modified, but you never know.
+// This file HOPEFULLY shouldn't need to be modified.
 
 #include "C++ Emitter (clang)/Tests.cpp"
 #include "Driver/Tests.cpp"
