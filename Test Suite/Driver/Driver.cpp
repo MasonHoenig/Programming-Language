@@ -1,72 +1,72 @@
-#include Driver.h
-
-#include Lexer.h // Lexer
-#include Parser.h // Parser
-#include AST.h // Parser
-////#include SematicAnalysis.h // Scematic Analysis
-//#include IR.h // Intermediate Representation
-//#include Emitter.h
-//#include TacToCpp.h
-
-
 #include <iostream>
-#include <fstream>
-#include <sstream>
+#include <vector>
+#include <string>
+
+#include "Driver.h"
+#include <cstdlib>
 #include <stdexcept>
 
+int RunCompiler(const std::string& inputPath)
+{
+    try
+    {
+        // 1. Run Lexer
+        std::vector<Token> tokens = RunLexerProgram(inputPath);
 
+        std::cout << "[SUCCESS] Lexer completed.\n";
 
-Driver::Driver(){}
+        // 2. Run Parser
+        Parser parser(tokens);
+        ASTNode* ast = parser.Parse();
 
-    // pull source and into string
-    std:string Driver::readFile(const std::string& filename) {
-        std:ifstream file(filename);
+        if (!ast) {
+            throw std::runtime_error("Parser returned empty AST.");
+        }
+        std::cout << "[SUCCESS] Parser completed.\n";
 
-        if(!file.is_open()){
-            throw std::runtime_error("Could not open source file + filename");
+        // 3. Run Code Generator
+        Program* program = dynamic_cast<Program*>(ast);
+
+        if (!program)
+        {
+            throw std::runtime_error("Failed to generate Program AST.");
         }
 
-        std::stringstream buffer;
-        buffer << file.rdbuf();
+        GenerateCode(program);
 
-        return buffer.str();
-    }
+        std::cout << "[SUCCESS] Code generation completed.\n";
 
-int Driver::run(const std:string& sourceFile) {
-    try {
-        //read source
+        // 4. Final confirmation
+        std::cout << "\nCompilation completed successfully!\n";
+        std::cout << "C++ output file: output.cpp\n";
+    
+        //5.  CLANG
 
-        std::cout << "Reading source\n";
-        std::string source = readFile(sourceFile);
+        std::cout << "CLANG Compiling\n";
 
-        // lexer
+        int compileResult = std::system(
+            "clang++ output.cpp -o output.exe"
+        );
 
-        std::cout << "Lexer running\n";
-        std::vector<Token> tokens = RunLexerProgram(sourceFile);
-
-        //parser
-
-        std::cout << "Parser running\n";
-        Parser parser(tokens);
-        if (ast == nullptr) {
-            std::cerr << "Parser failed to make AST\n";
+        if (compileResult != 0) {
+            std::cerr << "CLANG Failed\n";
             return 1;
         }
 
-        // sematic analysis
+        std::cout << "CLANG Passed\n";
 
-            // sematic code tbd
+        std::cout << "Running\n";
 
-        // IR
+        int runResult = std::system("output.exe");
 
-            // ir code tbd
-
-        //emitter
-
-            // emitter code waiting on IR
-
-        // clang
-        // tbd, needs more research
+        return runResult;
+    
+    }
+        catch (const std::exception& e)
+    {
+        std::cerr << "[ERROR] Compilation failed: " << e.what() << "\n";
+        return 1;
     }
 }
+
 

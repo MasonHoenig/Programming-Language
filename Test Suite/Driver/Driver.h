@@ -1,18 +1,13 @@
 #ifndef DRIVER_H
 #define DRIVER_H
 
+#pragma once
+
 #include <string>
 
-class Driver {
-public:
-    Driver();
+#include "../Lexer/Lexer.h"
+#include "../Parser/Parser.h"
+#include "../Intermediate Representation/CodeGeneration.h"
+#include "../Parser/AST.h"
 
-
-    int run(const std::string& sourceFile);
-
-private:
-    std::string readFile(const std::string& filename);
-};
-
-
-#endif
+void RunCompiler(const std::string& inputPath);
