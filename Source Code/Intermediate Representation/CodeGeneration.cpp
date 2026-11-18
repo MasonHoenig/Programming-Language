@@ -68,14 +68,11 @@ std::string generateStatement(const Statement* statement, int indent) {
     }
 
     if (const WhileLoop* whileState = dynamic_cast<const WhileLoop*>(statement)) {
-        std::string out = std::string(indent * 4, ' ');
-        out += "while (" + generateCondition(whileState->condition) + "){\n";
-        for(Statement* bodyStatement : whileState->body) {
-            generateStatement(bodyStatement,indent+1);
-        }
-        out+= "}\n";
-        return out;
-    }
+    std::string pad(indent * 4, ' ');
+    return pad + "while (" + generateExpression(whileState->condition) + ") {\n"
+        + generateBlock(whileState->body, indent + 1)
+        + pad + "}\n";
+}
 
     if (const ForLoop* forState = dynamic_cast<const ForLoop*>(statement)) {
         std::string pad(indent * 4, ' ');
