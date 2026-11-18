@@ -176,7 +176,7 @@ public:
 
     std::vector<Token> tokenize(int line, int vecSize, bool commenting, std::vector<std::string> vars) {
         std::vector<Token> tokens;
-        bool isEquation = false;
+        //bool isEquation = false;
         bool quoting = false;
         std::string newWord = "";
         SourceLocation newSL = { line, 0, vecSize };
@@ -309,7 +309,7 @@ public:
                     }
                     tokens.emplace_back(TokenType::Assign, std::string(1, currentChar), newSL);
                     position++;
-                    isEquation = true;
+                    //isEquation = true;
                 }
             }
             else if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' || currentChar == '%') {

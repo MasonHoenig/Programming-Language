@@ -1,3 +1,5 @@
+#define DRIVER_H
+
 #pragma once
 
 #include <string>
@@ -7,4 +9,4 @@
 #include "../Intermediate Representation/CodeGeneration.h"
 #include "../Parser/AST.h"
 
-void RunCompiler(const std::string& inputPath);
+int RunCompiler(const std::string& inputPath);

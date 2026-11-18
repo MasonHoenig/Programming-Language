@@ -1,5 +1,6 @@
 #pragma once
-
+#include <vector>
+#include <string>
 #include "AST.h"
 
 class Parser{
@@ -26,6 +27,7 @@ private:
     ArrayDeclaration* parseArrayDeclaration();
     FunctionDeclaration* parseFunctionDeclaration();
     ForLoop* parseForLoop();
+    AssignmentStatement* parseAssignment();
 
     //Swine Specific Parsing
     NodeDeclaration* parseNodeDeclaration(); // Ex: Node Castle { ... }

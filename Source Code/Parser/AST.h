@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 #include <vector>
 #include "../Lexer/Lexer.h" // Get Token Class
@@ -19,7 +18,7 @@ class Expression : public ASTNode {};
 // Base class for root node
 class Program : public ASTNode {
 public:
-    std::vector<Statement*> declarations; 
+    std::vector<Statement*> declarations;
 };
 
 // ---Expression Classes---
@@ -104,6 +103,12 @@ public:
     Expression* condition; // Ex: y < 5
     Statement* update; // Ex: y = y + 1
     std::vector<Statement*> body; // The code block
+};
+
+class AssignmentStatement : public Statement {
+public:
+    std::string identifier; // Ex: Variable being assigned (x)
+    Expression* value; // The value its being set to (5)
 };
 
 // ---Swine Specific---
