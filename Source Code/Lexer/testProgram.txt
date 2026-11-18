@@ -1,0 +1,11 @@
+variable number x = 5; //comment
+while (x < 10) {
+	x = x - 4;
+	/* a
+	b
+	c
+	d
+	e
+	f*/
+	x = x + 1;
+}

@@ -1,11 +1,11 @@
 #pragma once
-
 #include <string>
 #include <vector>
 #include "../Lexer/Lexer.h" // Get Token Class
 
 class ASTNode {
 public:
+    //SourceLocation location; // Needed for Semantic Analysis errors, comes from Lexer
     //SourceLocation location; // Needed for Semantic Analysis errors
     virtual ~ASTNode() = default; // Virtual destructor cleanup
 };
@@ -38,8 +38,26 @@ public:
 class BinaryExpression : public Expression {
 public:
     Expression* left; // Left side of operation
-    TokenType op; // The operator Ex: +, -, =, <, ect
+    std::string op; // The operator Ex: +, -, =, <, ect
     Expression* right; // The right side of the operation
+};
+
+class UnaryExpression : public Expression {
+public:
+    std::string op; // The operator Ex: not, -
+    Expression* right; // The expression being operated on
+};
+
+class FunctionCallExpression : public Expression {
+public:
+    std::string functionName; // Ex: "print"
+    std::vector<Expression*> arguments; // The variables or literals passed in
+};
+
+class ArrayAccessExpression : public Expression {
+public:
+    std::string arrayName; // Ex: "NumberArray"
+    Expression* index; // The index being accessed, Ex: 0
 };
 
 // ---Standard Statements---
@@ -62,6 +80,36 @@ class WhileLoop : public Statement {
 public:
     Expression* condition; // What is evaluated to true or false
     std::vector<Statement*> body; // Block of code if true
+};
+
+class ArrayDeclaration : public Statement {
+public:
+    std::string varType; // Ex: number
+    std::string identifier; // Variable Name
+    Expression* size; // The size inside the brackets
+    std::vector<Expression*> elements; // The initialized elements, if any
+};
+
+class FunctionDeclaration : public Statement {
+public:
+    std::string returnType; // Ex: void, word
+    std::string name; // Function name
+    std::vector<std::pair<std::string, std::string>> parameters; // Pair of <Type, Name>
+    std::vector<Statement*> body; // The code block inside the function
+};
+
+class ForLoop : public Statement {
+public:
+    Statement* initialization; // Ex: variable number y = 0
+    Expression* condition; // Ex: y < 5
+    Statement* update; // Ex: y = y + 1
+    std::vector<Statement*> body; // The code block
+};
+
+class AssignmentStatement : public Statement {
+public:
+    std::string identifier; // Ex: Variable being assigned (x)
+    Expression* value; // The value its being set to (5)
 };
 
 // ---Swine Specific---

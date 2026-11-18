@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "../Lexer/Lexer.h" // Get Token Class
 #include "AST.h"
 
 class Parser{
@@ -25,6 +24,10 @@ private:
     VariableDeclaration* parseVariableDeclaration();
     IfStatement* parseIfStatement();
     WhileLoop* parseWhileLoop();
+    ArrayDeclaration* parseArrayDeclaration();
+    FunctionDeclaration* parseFunctionDeclaration();
+    ForLoop* parseForLoop();
+    AssignmentStatement* parseAssignment();
 
     //Swine Specific Parsing
     NodeDeclaration* parseNodeDeclaration(); // Ex: Node Castle { ... }
@@ -34,6 +37,11 @@ private:
     Expression* parseExpression();
     Expression* parseComparison();
     Expression* parseArithmetic();
+
+    Expression* parseUnary(); 
+    Expression* parseFunctionCall(std::string functionName); 
+    Expression* parseArrayAccess(std::string arrayName); 
+
     Expression* parsePrimary(); // For Literals
 
 public:
