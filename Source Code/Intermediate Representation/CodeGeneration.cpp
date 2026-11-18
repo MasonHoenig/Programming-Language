@@ -19,8 +19,8 @@ std::string mapType(const std::string& type) {
     return it->second;
 }
 
-// Takes Expression*, figures out what concrete type it is, and returns a string representing the complete expression.
 // ---Expression Generation---
+// Takes Expression*, figures out what concrete type it is, and returns a string representing the complete expression.
 std::string generateExpression(const Expression* expr) {
 
     if (const LiteralExpression *literal = dynamic_cast<const LiteralExpression *>(expr))
@@ -61,7 +61,13 @@ std::string generateStatement(const Statement* statement, int indent) {
         return generateIf(ifState, indent);
     }
     if (const WhileLoop* whileState = dynamic_cast<const WhileLoop*>(statement)) {
-        // placeholder
+        std::string out = std::string(indent * 4, ' ');
+        out += "while (" + generateExpression(whileState->condition) + "){\n";
+        for(Statement* bodyStatement : whileState->body) {
+            generateStatement(bodyStatement,indent+1);
+        }
+        out+= "}\n";
+        return out;
     }
     if (const ForLoop* forState = dynamic_cast<const ForLoop*>(statement))
     {
@@ -112,64 +118,64 @@ std::string generateIf(const IfStatement* node, int indent, bool isElseIf) {
 
 // one liner here removes double check. Works well with recursive if-else, whiles, for, etc.
 void handleStatement(Statement* statement, std::ofstream* output) {
-    *output << generateStatement(statement, 0);
+    *output << generateStatement(statement);
 }
 
-//void handleStatement(Statement* statement, std::ofstream* output){
-//
-//    bool validPolyClass = false; //Set this to true at the beginning of all the statement handling
-//
-//    if (const VariableDeclaration* decl = dynamic_cast<const VariableDeclaration*>(statement)) {
-//        *output << generateStatement(statement, 0);
-//    }
-//    
-//    if (const IfStatement *ifState = dynamic_cast<IfStatement *>(statement))
-//    {
-//        validPolyClass = true;
-//        // this could be written inline, but its a longer function so I left it out for now.
-//        *output << generateIf(ifState, 0);
-//    }
-//    
-//    if (const WhileLoop *whiLoop = dynamic_cast<WhileLoop *>(statement))
-//    {
-//        validPolyClass = true;
-//
-//        std::cerr << "Error: Function not yet implemented";
-//        exit(EXIT_FAILURE);
-//    }
-//    
-//    if (const ArrayDeclaration *arrDec = dynamic_cast<const ArrayDeclaration *>(statement))
-//    {
-//        validPolyClass = true;
-//
-//        std::cerr << "Error: Function not yet implemented";
-//        exit(EXIT_FAILURE);
-//
-//    }
-//    
-//    if (const FunctionDeclaration *funDec = dynamic_cast<const FunctionDeclaration *>(statement))
-//    {
-//        validPolyClass = true;
-//
-//        std::cerr << "Error: Function not yet implemented";
-//        exit(EXIT_FAILURE);
-//
-//    }
-//    
-//    if (const ForLoop *forLp = dynamic_cast<const ForLoop *>(statement))
-//    {
-//        validPolyClass = true;
-//
-//        std::cerr << "Error: Function not yet implemented";
-//        exit(EXIT_FAILURE);
-//
-//    }
-//    if(!validPolyClass){
-//        std::cerr << "Error: Unrecognised Statement type";
-//        exit(EXIT_FAILURE);
-//    }
-//}
-
+/*void handleStatement(Statement* statement, std::ofstream* output){
+* 
+*     bool validPolyClass = false; //Set this to true at the beginning of all the statement handling
+* 
+*     if (const VariableDeclaration* decl = dynamic_cast<const VariableDeclaration*>(statement)) {
+*         *output << generateStatement(statement, 0);
+*     }
+*     
+*     if (const IfStatement *ifState = dynamic_cast<IfStatement *>(statement))
+*     {
+*         validPolyClass = true;
+*         // this could be written inline, but its a longer function so I left it out for now.
+*         *output << generateIf(ifState, 0);
+*     }
+*     
+*     if (const WhileLoop *whiLoop = dynamic_cast<WhileLoop *>(statement))
+*     {
+*         validPolyClass = true;
+* 
+*         std::cerr << "Error: Function not yet implemented";
+*         exit(EXIT_FAILURE);
+*     }
+*     
+*     if (const ArrayDeclaration *arrDec = dynamic_cast<const ArrayDeclaration *>(statement))
+*     {
+*         validPolyClass = true;
+* 
+*         std::cerr << "Error: Function not yet implemented";
+*         exit(EXIT_FAILURE);
+* 
+*     }
+*     
+*     if (const FunctionDeclaration *funDec = dynamic_cast<const FunctionDeclaration *>(statement))
+*     {
+*         validPolyClass = true;
+* 
+*         std::cerr << "Error: Function not yet implemented";
+*         exit(EXIT_FAILURE);
+* 
+*     }
+*     
+*     if (const ForLoop *forLp = dynamic_cast<const ForLoop *>(statement))
+*     {
+*         validPolyClass = true;
+* 
+*         std::cerr << "Error: Function not yet implemented";
+*         exit(EXIT_FAILURE);
+* 
+*     }
+*     if(!validPolyClass){
+*         std::cerr << "Error: Unrecognised Statement type";
+*         exit(EXIT_FAILURE);
+*     }
+*}
+*/
 std::string GenerateCode(const Program* program) {
 
     std::string outputPath = "./GeneratedCode.cpp";
