@@ -6,7 +6,6 @@
 class ASTNode {
 public:
     //SourceLocation location; // Needed for Semantic Analysis errors, comes from Lexer
-    //SourceLocation location; // Needed for Semantic Analysis errors
     virtual ~ASTNode() = default; // Virtual destructor cleanup
 };
 
