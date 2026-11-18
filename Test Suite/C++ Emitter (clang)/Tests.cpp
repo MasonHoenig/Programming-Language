@@ -1,5 +1,5 @@
 #include "../Run_Tests.h"
-#include "../../Source Code/C++ Emitter (clang)/Emitter.h"
+#include "../../Source Code/C++ Emitter (clang)/VariableDeclaration.cpp"
 #include "Tests.h"
 
 #include <cctype>

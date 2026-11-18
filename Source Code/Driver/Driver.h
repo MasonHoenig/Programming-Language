@@ -1,0 +1,12 @@
+#define DRIVER_H
+
+#pragma once
+
+#include <string>
+
+#include "../Lexer/Lexer.h"
+#include "../Parser/Parser.h"
+#include "../Code Generation/CodeGeneration.h"
+#include "../Parser/AST.h"
+
+int RunCompiler(const std::string& inputPath);

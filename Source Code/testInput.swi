@@ -1,0 +1,6 @@
+variable decimal x = 10;
+variable number y = 1;
+
+while (x > y) {
+	y = y + 1;
+}

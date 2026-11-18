@@ -6,34 +6,34 @@
 
 //Constructor and Traversal
 
-Parser::Parser(const std::vector<Token>& inputTokens){
+Parser::Parser(const std::vector<Token>& inputTokens) {
     tokens = inputTokens;
     currentIndex = 0;
 }
 
-bool Parser::isAtEnd(){
+bool Parser::isAtEnd() {
     //We are at end if out of bounds, OR if current token is EOF
     return currentIndex >= tokens.size() || tokens[currentIndex].type == TokenType::EndFileMarker;
 }
 
 Token Parser::peek() {
-    if (currentIndex >= tokens.size()){
+    if (currentIndex >= tokens.size()) {
         // if we go out of bounds, return dummy EOF
-        SourceLocation dummyLoc = {0,0,0};
+        SourceLocation dummyLoc = { 0,0,0 };
         return Token(TokenType::EndFileMarker, "EOF", dummyLoc); // construct dumy EOF
     }
     return tokens[currentIndex];
 }
 
-Token Parser::advance(){
-    if (!isAtEnd()){
+Token Parser::advance() {
+    if (!isAtEnd()) {
         currentIndex++;
     }
     return tokens[currentIndex - 1];
 }
 
-bool Parser::match(TokenType expectedType){
-    if (isAtEnd() || peek().type != expectedType){
+bool Parser::match(TokenType expectedType) {
+    if (isAtEnd() || peek().type != expectedType) {
         //throw a standard error for now, later push to diagnostic vector 
         throw std::runtime_error("Syntax Error: Unexpected token '" + peek().value + "'");
     }
@@ -43,22 +43,23 @@ bool Parser::match(TokenType expectedType){
 
 //Parsing logic for recursive descent
 
-ASTNode* Parser::Parse(){
+ASTNode* Parser::Parse() {
     return parseProgram();
 }
 
-Statement* Parser::parseStatement(){
+Statement* Parser::parseStatement() {
     //look at current token to see kind of statement
 
-    if(peek().type == TokenType::Keyword){
-        if (peek().value == "while"){
+    if (peek().type == TokenType::Keyword) {
+        if (peek().value == "while") {
             return parseWhileLoop();
-        } else if (peek().value == "variable" || peek().value == "constant") {
+        }
+        else if (peek().value == "variable" || peek().value == "constant") {
             return parseVariableDeclaration();
         }
     }
 
-    if(peek().type == TokenType::VarName){
+    if (peek().type == TokenType::VarName) {
         return parseAssignment();
     }
 
@@ -68,7 +69,7 @@ Statement* Parser::parseStatement(){
 
 
 
-VariableDeclaration* Parser::parseVariableDeclaration(){
+VariableDeclaration* Parser::parseVariableDeclaration() {
     VariableDeclaration* decl = new VariableDeclaration();
 
     // 1. Consume 'variable' keyword
@@ -94,7 +95,7 @@ VariableDeclaration* Parser::parseVariableDeclaration(){
     return decl;
 }
 
-WhileLoop* Parser::parseWhileLoop(){
+WhileLoop* Parser::parseWhileLoop() {
     WhileLoop* whil = new WhileLoop();
 
     // 1. Consume 'while' keyword
@@ -122,7 +123,7 @@ WhileLoop* Parser::parseWhileLoop(){
     return whil;
 }
 
-AssignmentStatement* Parser::parseAssignment(){
+AssignmentStatement* Parser::parseAssignment() {
     AssignmentStatement* asign = new AssignmentStatement();
 
     // 1. Grab and consume var name
@@ -143,12 +144,12 @@ AssignmentStatement* Parser::parseAssignment(){
 
 Program* Parser::parseProgram() {
     Program* program = new Program();
-    
+
     // Keep parsing until run out of tokens or hit the EOF
     while (!isAtEnd()) {
         program->declarations.push_back(parseStatement());
     }
-    
+
     return program;
 }
 
@@ -201,7 +202,7 @@ Expression* Parser::parseArithmetic() {
         binExpr->right = rightNode;
 
         // 5. New binary expression becomes left side
-        leftNode = binExpr; 
+        leftNode = binExpr;
     }
 
     return leftNode;
@@ -211,22 +212,22 @@ Expression* Parser::parsePrimary() {
     Token current = peek();
 
     // Literals
-    if (current.type == TokenType::Integer || current.type == TokenType::Decimal || 
+    if (current.type == TokenType::Integer || current.type == TokenType::Decimal ||
         current.type == TokenType::Word || current.type == TokenType::BoolValue) {
-        
+
         LiteralExpression* expr = new LiteralExpression();
         expr->value = current.value;
         expr->type = current.type; // Set type and value
-        
+
         advance(); // Consume the literal
         return expr;
     }
-    
+
     // Handle variable names (Identifiers) "x"
     if (current.type == TokenType::VarName) {
         IdentifierExpression* expr = new IdentifierExpression();
         expr->name = current.value; // Ex: "x"
-        
+
         advance(); // Consume the variable name
         return expr;
     }
@@ -237,21 +238,21 @@ Expression* Parser::parsePrimary() {
 
 //AST Printer 
 
-std::string Parser::PrintTree(ASTNode* node){
+std::string Parser::PrintTree(ASTNode* node) {
     if (!node) return "";
 
     std::ostringstream output;
 
     //Check if program root node
-    if (Program* prog = dynamic_cast<Program*>(node)){
+    if (Program* prog = dynamic_cast<Program*>(node)) {
         output << "Program\n";
-        for (Statement* stmt : prog->declarations){
+        for (Statement* stmt : prog->declarations) {
             output << PrintTree(stmt); // recursive call all top level stmt
         }
     }
 
     //Check if node is var declaration
-    else if (VariableDeclaration* varDecl = dynamic_cast<VariableDeclaration*>(node)){
+    else if (VariableDeclaration* varDecl = dynamic_cast<VariableDeclaration*>(node)) {
         output << "└── VariableDeclaration\n";
         output << "    ├── Type: " << varDecl->varType << "\n";
         output << "    ├── Identifier: " << varDecl->identifier << "\n";
@@ -265,12 +266,12 @@ std::string Parser::PrintTree(ASTNode* node){
         output << "└── AssignmentStatement\n";
         output << "    ├── Identifier: " << assignStmt->identifier << "\n";
         output << "    └── Value: \n";
-        
+
         // Recursively print the right side of the equals sign
         output << "        " << PrintTree(assignStmt->value);
     }
     //Check if node is literal expression
-    else if (LiteralExpression* litExpr = dynamic_cast<LiteralExpression*>(node)){
+    else if (LiteralExpression* litExpr = dynamic_cast<LiteralExpression*>(node)) {
         output << "LiteralExpression\n";
         output << "        └── Value: " << litExpr->value;
     }
@@ -280,7 +281,7 @@ std::string Parser::PrintTree(ASTNode* node){
         output << "    ├── Condition: \n";
         output << "    │   " << PrintTree(whileStmt->condition);
         output << "    └── Body: \n";
-        
+
         for (Statement* stmt : whileStmt->body) {
             output << "        " << PrintTree(stmt);
         }

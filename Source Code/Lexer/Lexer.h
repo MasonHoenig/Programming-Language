@@ -13,7 +13,6 @@ enum class TokenType {
     Integer,
     Decimal,
     Word,
-    //SingleChar,
     BoolValue,
     Assign,
     Math,
@@ -37,7 +36,6 @@ struct Token {
     std::string value;
     SourceLocation sourceLocal;
 
-    //Token(TokenType t, const std::string& v):type(t),value(v) {}
     Token(TokenType t, const std::string& v, SourceLocation sl) :type(t), value(v), sourceLocal(sl) {}
 };
 
@@ -70,7 +68,6 @@ private:
         varTypes["number"] = TokenType::VarType;
         varTypes["decimal"] = TokenType::VarType;
         varTypes["word"] = TokenType::VarType;
-        //varTypes["letter"] = TokenType::VarType;
         varTypes["bool"] = TokenType::VarType;
         varTypes["void"] = TokenType::VarType; //only for functions
     }
@@ -163,10 +160,14 @@ private:
         return false;
     }
 
-    /*Token rewriteToVarName(Token var) {
-
-        return var;
-    }*/
+    bool IsExistingVar2(std::vector<std::string> tokens, std::string name) {
+        for (const auto& token : tokens) {
+            if (token == name) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 public:
     LexicalAnalyzer(const std::string& source) :input(source), position(0) {
@@ -176,7 +177,6 @@ public:
 
     std::vector<Token> tokenize(int line, int vecSize, bool commenting, std::vector<std::string> vars) {
         std::vector<Token> tokens;
-        bool isEquation = false;
         bool quoting = false;
         std::string newWord = "";
         SourceLocation newSL = { line, 0, vecSize };
@@ -259,15 +259,8 @@ public:
                 else if (boolTypes.find(word) != boolTypes.end()) {
                     tokens.emplace_back(TokenType::BoolValue, word, newSL);
                 }
-                else if ((tokens.size() > 0 && (tokens.back().type == TokenType::VarType || tokens.back().type == TokenType::Comparison))/* || (isEquation && tokens.back().type != TokenType::Quote)*/) {
+                else if ((tokens.size() > 0 && (tokens.back().type == TokenType::VarType || tokens.back().type == TokenType::Comparison))) {
                     tokens.emplace_back(TokenType::VarName, word, newSL);
-                    /*} else if (tokens.size() > 0 && tokens.back().type == TokenType::Quote) {
-                        if (word.length() == 1) {
-                            tokens.emplace_back(TokenType::SingleChar, word, newSL);
-                        } else {
-                            tokens.emplace_back(TokenType::Word, word, newSL);
-                        }
-                        tokens.emplace_back(TokenType::Word, word, newSL);*/
                 }
                 else {
                     if (IsExistingVar(tokens, word)) {
@@ -281,7 +274,6 @@ public:
             }
             else if (isNumber(currentChar)) {
                 std::string number = getNextNumber();
-                //what is npos?
                 if (number.find('.') != std::string::npos) {
                     tokens.emplace_back(TokenType::Decimal, number, newSL);
                 }
@@ -309,13 +301,11 @@ public:
                     }
                     tokens.emplace_back(TokenType::Assign, std::string(1, currentChar), newSL);
                     position++;
-                    isEquation = true;
                 }
             }
             else if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' || currentChar == '%') {
                 tokens.emplace_back(TokenType::Math, std::string(1, currentChar), newSL);
                 position++;
-                // ' removed because no more single characters
             }
             else if (currentChar == '\"') {
                 tokens.emplace_back(TokenType::Quote, std::string(1, currentChar), newSL);

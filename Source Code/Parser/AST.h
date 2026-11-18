@@ -18,7 +18,7 @@ class Expression : public ASTNode {};
 // Base class for root node
 class Program : public ASTNode {
 public:
-    std::vector<Statement*> declarations; 
+    std::vector<Statement*> declarations;
 };
 
 // ---Expression Classes---
