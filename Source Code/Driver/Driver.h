@@ -6,7 +6,7 @@
 
 #include "../Lexer/Lexer.h"
 #include "../Parser/Parser.h"
-#include "../Intermediate Representation/CodeGeneration.h"
+#include "../Code Generation/CodeGeneration.h"
 #include "../Parser/AST.h"
 
 int RunCompiler(const std::string& inputPath);
