@@ -69,7 +69,7 @@ std::string generateStatement(const Statement* statement, int indent) {
 
     if (const WhileLoop* whileState = dynamic_cast<const WhileLoop*>(statement)) {
     std::string pad(indent * 4, ' ');
-    return pad + "while (" + generateExpression(whileState->condition) + ") {\n"
+    return pad + "while (" + generateCondition(whileState->condition) + ") {\n"
         + generateBlock(whileState->body, indent + 1)
         + pad + "}\n";
 }
@@ -115,6 +115,7 @@ std::string generateBlock(const std::vector<Statement*>& body, int indent) {
     return output;
 }
 
+// removes extra parentheses from conditionals (while, if, etc.)
 std::string generateCondition(const Expression* expr) {
     if (const BinaryExpression* binaryExpr = dynamic_cast<const BinaryExpression*>(expr))
         return generateExpression(binaryExpr->left) + " " + binaryExpr->op + " "
