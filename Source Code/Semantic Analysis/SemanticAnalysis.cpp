@@ -205,6 +205,23 @@ bool whileLp(WhileLoop* node, SemAnalysis sA, std::stack<std::unordered_map<std:
     return SemTests(b, sA, scope);
 }
 
+bool ArrayDec(ArrayDeclaration* node, SemAnalysis sA, std::stack<std::unordered_map<std::string, std::string>> scope) {
+    
+}
+
+bool FunctionDec(FunctionDeclaration* node, SemAnalysis sA, std::stack<std::unordered_map<std::string, std::string>> scope) {
+
+}
+
+bool forL(ForLoop* node, SemAnalysis sA, std::stack<std::unordered_map<std::string, std::string>> scope) {
+    
+}
+
+bool AssignState(AssignmentStatement* node, SemAnalysis sA, std::stack<std::unordered_map<std::string, std::string>> scope) {
+    
+}
+
+// ---Swine Specific---
 bool GotoState(GotoStatement* node, SemAnalysis sA, std::stack<std::unordered_map<std::string, std::string>> scope) {
     
 }
