@@ -36,7 +36,7 @@ void sematicErrorTest(){ // tests for type mismatch
 }
 
 void ioTestErrorTest(){ // tests for missing/empty input file
-    std::string input = "fakeMissingFile.cpp":
+    std::string input = "fakeMissingFile.cpp";
 }
 
 

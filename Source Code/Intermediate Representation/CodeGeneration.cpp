@@ -19,8 +19,8 @@ std::string mapType(const std::string& type) {
     return it->second;
 }
 
-// Takes Expression*, figures out what concrete type it is, and returns a string representing the complete expression.
 // ---Expression Generation---
+// Takes Expression*, figures out what concrete type it is, and returns a string representing the complete expression.
 std::string generateExpression(const Expression* expr) {
 
     if (const LiteralExpression *literal = dynamic_cast<const LiteralExpression *>(expr))
@@ -67,12 +67,14 @@ std::string generateStatement(const Statement* statement, int indent) {
         return generateIf(ifState, indent);
     }
 
-    // TODO: removed for now for integration -- needs word
     if (const WhileLoop* whileState = dynamic_cast<const WhileLoop*>(statement)) {
-        std::string pad(indent * 4, ' ');
-        return pad + "while (" + generateCondition(whileState->condition) + ") {\n"
-            + generateBlock(whileState->body, indent + 1)
-            + pad + "}\n";
+        std::string out = std::string(indent * 4, ' ');
+        out += "while (" + generateCondition(whileState->condition) + "){\n";
+        for(Statement* bodyStatement : whileState->body) {
+            generateStatement(bodyStatement,indent+1);
+        }
+        out+= "}\n";
+        return out;
     }
 
     if (const ForLoop* forState = dynamic_cast<const ForLoop*>(statement)) {
